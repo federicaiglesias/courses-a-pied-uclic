@@ -40,4 +40,4 @@ Projet réalisé dans le cadre d’un stage chez **Uclic**, avec un fort accent 
 
 **Federica Iglesias**  
 Stage développeuse front-end chez Uclic (juin–juillet 2025)  
-[LinkedIn](https://www.linkedin.com/in/federica-iglesias/) – [Portfolio]([#](https://federicaiglesias.vercel.app/)) 
+[LinkedIn](https://www.linkedin.com/in/federica-iglesias/) – [Portfolio](https://federicaiglesias.vercel.app/) 
