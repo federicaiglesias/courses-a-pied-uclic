@@ -1,43 +1,36 @@
-# 🏃 Annuaire des Courses à Pied – Uclic
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Développement d’un annuaire web de courses à pied organisé par pays, région, ville et événement.  
-Projet réalisé dans le cadre d’un stage chez **Uclic**, avec un fort accent sur le **SEO technique** et la **modularité du contenu** via un CMS headless.
+## Getting Started
 
----
+First, run the development server:
 
-## 🧱 Stack technique
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-- **Framework** : [Next.js](https://nextjs.org/) (App Router, SSR/SSG/ISR)
-- **Base de données** : [Supabase](https://supabase.com/)
-- **Styling** : [TailwindCSS](https://tailwindcss.com/)
-- **CMS** : (à confirmer — Directus recommandé)
-- **IDE** : [Cursor](https://www.cursor.sh/)
-- **Déploiement** : Vercel (à venir)
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
----
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## 📌 Fonctionnalités principales
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-- 🌍 Navigation géographique : `/fr/france/occitanie/toulouse/marathon-toulouse`
-- 🌐 Multilingue (FR / EN)
-- 📄 Pages statiques générées pour le SEO
-- 🔍 Métadonnées dynamiques (`generateMetadata`)
-- 💬 Données éditables via CMS connecté à Supabase
-- 🧭 Sitemap, hreflang, Open Graph, JSON-LD
+## Learn More
 
----
+To learn more about Next.js, take a look at the following resources:
 
-## 📎 Ressources
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-- 🔗 [Diagramme de la base de données (dbdiagram.io)] (lien à insérer)
-- 🔗 [Supabase Dashboard](https://app.supabase.com/) (a venir)
-- 🔗 CMS (à venir)
-- 🔗 Documentation technique (Notion ou autre)
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
----
+## Deploy on Vercel
 
-## 👩‍💻 Développé par
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-**Federica Iglesias**  
-Stage développeuse front-end chez Uclic (juin–juillet 2025)  
-[LinkedIn](https://www.linkedin.com/in/federica-iglesias/) – [Portfolio](https://federicaiglesias.vercel.app/) 
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
