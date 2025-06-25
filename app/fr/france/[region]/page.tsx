@@ -1,14 +1,30 @@
+import CityList from "@/components/CityList";
+
 interface Props {
-  params: Promise<{ region: string }>;
+  params: { region: string };
 }
 
-export default async function RegionPage({ params }: Props) {
-  const { region } = await params;
+const dummyCities: Record<string, Array<{ slug: string; name: string }>> = {
+  occitanie: [
+    { slug: "toulouse", name: "Toulouse" },
+    { slug: "montpellier", name: "Montpellier" },
+  ],
+  "ile-de-france": [
+    { slug: "paris", name: "Paris" },
+    { slug: "versailles", name: "Versailles" },
+  ],
+  auvergne: [{ slug: "clermont-ferrand", name: "Clermont-Ferrand" }],
+};
+
+export default function RegionPage({ params }: Props) {
+  const cities = dummyCities[params.region] || [];
 
   return (
     <main className="p-8">
-      <h1 className="text-2xl font-bold text-blue-800">Région : {region}</h1>
-      <p className="text-gray-700">Liste des villes à venir...</p>
+      <h1 className="text-2xl font-bold text-blue-800 mb-4">
+        Villes en {params.region}
+      </h1>
+      <CityList regionSlug={params.region} cities={cities} />
     </main>
   );
 }
