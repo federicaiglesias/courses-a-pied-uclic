@@ -1,4 +1,4 @@
-export const metadata = {
+/*export const metadata = {
     title: "Running races in France",
     description: "Explore regions in France and find upcoming running events near you.",
   };
@@ -37,4 +37,4 @@ export const metadata = {
       </main>
     );
   }
-  
+  */

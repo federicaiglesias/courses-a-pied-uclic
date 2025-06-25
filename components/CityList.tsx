@@ -1,26 +1,26 @@
 interface City {
-    slug: string;
-    name: string;
-  }
-  
-  interface Props {
-    regionSlug: string;
-    cities: City[];
-  }
-  
-  export default function CityList({ regionSlug, cities }: Props) {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {cities.map((city) => (
+  slug: string;
+  name: string;
+  region_slug: string;
+}
+
+interface Props {
+  cities: City[];
+}
+
+export default function CityList({ cities }: Props) {
+  return (
+    <ul className="space-y-2">
+      {cities.map((city) => (
+        <li key={city.slug}>
           <a
-            key={city.slug}
-            href={`/fr/france/${regionSlug}/${city.slug}`}
-            className="block bg-white rounded shadow-md p-6 hover:shadow-xl transition"
+            href={`/fr/france/${city.region_slug}/${city.slug}`}
+            className="text-blue-600 underline hover:text-blue-800"
           >
-            <h2 className="text-lg font-semibold text-blue-700">{city.name}</h2>
+            {city.name}
           </a>
-        ))}
-      </div>
-    );
-  }
-  
+        </li>
+      ))}
+    </ul>
+  );
+}

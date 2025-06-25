@@ -1,41 +1,41 @@
+import { supabase } from "@/lib/supabase";
 import CityList from "@/components/CityList";
 
 interface Props {
-  params: { region: string };
+  params: Promise<{ region: string }>;
 }
-
-const dummyCities: Record<string, Array<{ slug: string; name: string }>> = {
-  occitanie: [
-    { slug: "toulouse", name: "Toulouse" },
-    { slug: "montpellier", name: "Montpellier" },
-  ],
-  "ile-de-france": [
-    { slug: "paris", name: "Paris" },
-    { slug: "versailles", name: "Versailles" },
-  ],
-  auvergne: [{ slug: "clermont-ferrand", name: "Clermont-Ferrand" }],
-};
 
 export async function generateMetadata({
   params,
 }: {
-  params: { region: string };
+  params: Promise<{ region: string }>;
 }) {
+  const { region } = await params;
   return {
-    title: `Courses à pied en ${params.region}`,
-    description: `Trouvez toutes les courses à pied organisées en ${params.region}`,
+    title: `Courses à pied en ${region}`,
+    description: `Trouvez toutes les courses à pied organisées en ${region}`,
   };
 }
 
-export default function RegionPage({ params }: Props) {
-  const cities = dummyCities[params.region] || [];
+export default async function RegionPage({ params }: Props) {
+  const { region } = await params;
+
+  const { data: cities, error } = await supabase
+    .from("cities")
+    .select("*")
+    .eq("region_slug", region);
+
+  if (error) {
+    console.error("Erreur Supabase:", error.message);
+    return <p>Erreur lors du chargement des villes.</p>;
+  }
 
   return (
     <main className="p-8">
-      <h1 className="text-2xl font-bold text-blue-800 mb-4">
-        Villes en {params.region}
+      <h1 className="text-3xl font-bold text-blue-800 mb-6">
+        Villes de la region {region}
       </h1>
-      <CityList regionSlug={params.region} cities={cities} />
+      <CityList cities={cities || []} />
     </main>
   );
 }
