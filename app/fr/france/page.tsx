@@ -6,6 +6,12 @@ const regions = [
   { slug: "auvergne", name: "Auvergne-Rhône-Alpes" },
 ];
 
+export const metadata = {
+  title: "Courses à pied en France",
+  description:
+    "Trouvez toutes les courses à pied organisées en France par région.",
+};
+
 export default function FrancePage() {
   return (
     <main className="p-8">

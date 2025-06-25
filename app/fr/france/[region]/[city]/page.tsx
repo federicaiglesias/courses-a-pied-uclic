@@ -22,6 +22,12 @@ const dummyEvents = [
     registration_url: "https://example.com/inscription/10k-toulouse",
   },
 ];
+export async function generateMetadata({ params }: { params: { city: string } }) {
+  return {
+    title: `Courses à pied à ${params.city}`,
+    description: `Trouvez toutes les courses à pied organisées à ${params.city}`,
+  };
+}
 
 export default function CityPage({ params }: Props) {
   return (
@@ -31,7 +37,12 @@ export default function CityPage({ params }: Props) {
       </h1>
       <div className="grid gap-6">
         {dummyEvents.map((event) => (
-          <EventCard key={event.slug} event={event} />
+          <EventCard
+            key={event.slug}
+            event={event}
+            regionSlug={params.region}
+            city={{ slug: params.city }}
+          />
         ))}
       </div>
     </main>

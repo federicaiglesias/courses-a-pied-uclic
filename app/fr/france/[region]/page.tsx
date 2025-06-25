@@ -16,6 +16,17 @@ const dummyCities: Record<string, Array<{ slug: string; name: string }>> = {
   auvergne: [{ slug: "clermont-ferrand", name: "Clermont-Ferrand" }],
 };
 
+export async function generateMetadata({
+  params,
+}: {
+  params: { region: string };
+}) {
+  return {
+    title: `Courses à pied en ${params.region}`,
+    description: `Trouvez toutes les courses à pied organisées en ${params.region}`,
+  };
+}
+
 export default function RegionPage({ params }: Props) {
   const cities = dummyCities[params.region] || [];
 
