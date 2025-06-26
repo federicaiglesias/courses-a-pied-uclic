@@ -31,11 +31,25 @@ export default async function RegionPage({ params }: Props) {
   }
 
   return (
-    <main className="p-8">
-      <h1 className="text-3xl font-bold text-blue-800 mb-6">
-        Villes de la region {region}
-      </h1>
-      <CityList cities={cities || []} />
-    </main>
+    <section className="py-16 px-6 bg-white">
+    <div className="max-w-4xl mx-auto text-center">
+      <h2 className="text-3xl font-bold text-blue-800 mb-10">
+        Villes de la région {region}
+      </h2>
+  
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {cities.map((city) => (
+          <a
+            key={city.slug}
+            href={`/fr/france/${region}/${city.slug}`}
+            className="bg-blue-50 border border-blue-100 rounded-xl p-6 hover:shadow-lg hover:scale-105 transition text-blue-800 font-medium"
+          >
+            {city.name}
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+  
   );
 }

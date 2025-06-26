@@ -17,28 +17,27 @@ interface EventCardProps {
 
 export default function EventCard({ event, regionSlug, city }: EventCardProps) {
   return (
-    <div className="bg-white rounded shadow-md p-4 hover:shadow-lg transition">
-      <h3 className="text-xl font-semibold text-blue-800 mb-1">
+    <div className="bg-white border border-blue-100 rounded-xl p-6 shadow hover:shadow-md transition-all">
+      <h3 className="text-xl font-semibold text-blue-700 mb-2">
         {event.title}
       </h3>
-      <p className="text-gray-600 text-sm mb-2">
-        📅 {new Date(event.date).toLocaleDateString("fr-FR")} –{" "}
-        {event.distance_km} km
-      </p>
-      <p className="text-gray-700 font-medium mb-4">{event.price}</p>
-      <a
-        href={`/fr/france/${regionSlug}/${city.slug}/${event.slug}`}
-        className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-      >
-        Voir les détails
-      </a>
-      <a
-        href={event.registration_url}
-        target="_blank"
-        className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-      >
-        S&apos;inscrire
-      </a>
+
+      <div className="text-gray-600 space-y-1 mb-4">
+        <p>📅 {event.date}</p>
+        <p>📏 {event.distance_km} km</p>
+        <p>💶 {event.price} €</p>
+      </div>
+
+      {event.registration_url && (
+        <a
+          href={event.registration_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block text-sm text-white bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 transition"
+        >
+          S'inscrire
+        </a>
+      )}
     </div>
   );
 }
