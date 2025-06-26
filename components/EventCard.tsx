@@ -27,7 +27,13 @@ export default function EventCard({ event, regionSlug, city }: EventCardProps) {
         <p>📏 {event.distance_km} km</p>
         <p>💶 {event.price} €</p>
       </div>
-
+      <a
+        href={`/fr/france/${regionSlug}/${city.slug}/${event.slug}`}
+        rel="noopener noreferrer"
+        className="inline-block text-sm text-white bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 transition"
+      >
+        Voir détails
+      </a>
       {event.registration_url && (
         <a
           href={event.registration_url}
