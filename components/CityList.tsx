@@ -6,15 +6,18 @@ interface City {
 
 interface Props {
   cities: City[];
+  lang?: "fr" | "en"; // por defecto es francés
 }
 
-export default function CityList({ cities }: Props) {
+export default function CityList({ cities, lang = "fr" }: Props) {
+  const discoverText = lang === "en" ? "Discover" : "Découvrir";
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {cities.map((city, index) => (
         <a
           key={city.slug}
-          href={`/fr/france/${city.region_slug}/${city.slug}`}
+          href={`/${lang}/france/${city.region_slug}/${city.slug}`}
           className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden border border-gray-100"
           style={{
             animationDelay: `${index * 100}ms`,
@@ -36,7 +39,7 @@ export default function CityList({ cities }: Props) {
             </h3>
 
             <div className="flex items-center justify-center space-x-2 text-gray-500 group-hover:text-blue-500 transition-colors duration-300">
-              <span className="text-sm">Découvrir</span>
+              <span className="text-sm">{discoverText}</span>
               <svg
                 className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300"
                 fill="none"

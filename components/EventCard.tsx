@@ -13,9 +13,18 @@ interface EventCardProps {
   city: {
     slug: string;
   };
+  lang?: "fr" | "en";
 }
 
-export default function EventCard({ event, regionSlug, city }: EventCardProps) {
+export default function EventCard({
+  event,
+  regionSlug,
+  city,
+  lang = "fr",
+}: EventCardProps) {
+  const detailLabel = lang === "en" ? "See details" : "Voir détails";
+  const registerLabel = lang === "en" ? "Register" : "S'inscrire";
+
   return (
     <div className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden border border-gray-100">
       {/* Gradient Overlay */}
@@ -51,10 +60,10 @@ export default function EventCard({ event, regionSlug, city }: EventCardProps) {
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3">
           <a
-            href={`/fr/france/${regionSlug}/${city.slug}/${event.slug}`}
+            href={`/${lang}/france/${regionSlug}/${city.slug}/${event.slug}`}
             className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-300 shadow-md hover:shadow-lg"
           >
-            <span>Voir détails</span>
+            <span>{detailLabel}</span>
             <svg
               className="w-4 h-4 ml-2"
               fill="none"
@@ -83,7 +92,7 @@ export default function EventCard({ event, regionSlug, city }: EventCardProps) {
               rel="noopener noreferrer"
               className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-colors duration-300 shadow-md hover:shadow-lg"
             >
-              <span>S'inscrire</span>
+              <span>{registerLabel}</span>
               <svg
                 className="w-4 h-4 ml-2"
                 fill="none"

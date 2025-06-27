@@ -5,15 +5,18 @@ interface Region {
 
 interface Props {
   regions: Region[];
+  lang?: "fr" | "en";
 }
 
-export default function RegionList({ regions }: Props) {
+export default function RegionList({ regions, lang = "fr" }: Props) {
+  const exploreText = lang === "en" ? "Explore" : "Explorer";
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {regions.map((region, index) => (
         <a
           key={region.slug}
-          href={`/fr/france/${region.slug}`}
+          href={`/${lang}/france/${region.slug}`}
           className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden border border-gray-100"
           style={{
             animationDelay: `${index * 100}ms`,
@@ -35,7 +38,7 @@ export default function RegionList({ regions }: Props) {
             </h3>
 
             <div className="flex items-center justify-center space-x-2 text-gray-500 group-hover:text-blue-500 transition-colors duration-300">
-              <span className="text-sm">Explorer</span>
+              <span className="text-sm">{exploreText}</span>
               <svg
                 className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300"
                 fill="none"

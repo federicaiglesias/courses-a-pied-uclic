@@ -120,7 +120,7 @@ export default async function FrancePage() {
           <h2 className="text-3xl font-bold text-blue-800 mb-10">
             Choisissez une région
           </h2>
-          <RegionList regions={regions} />
+          <RegionList regions={regions} lang="fr"/>
         </section>
         <section className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-blue-800 mb-10">
@@ -196,7 +196,7 @@ export default async function FrancePage() {
               pied disponibles.
             </p>
           </div>
-          <RegionList regions={regions} />
+          <RegionList regions={regions} lang="fr" />
         </div>
       </section>
 
@@ -223,6 +223,7 @@ export default async function FrancePage() {
                     event={evt}
                     regionSlug={city?.region_slug || ""}
                     city={{ slug: evt.city_slug }}
+                    lang="fr"
                   />
                 );
               })}

@@ -9,9 +9,13 @@ interface EventDetailsProps {
     registration_url: string;
     description: string;
   };
+  lang?: "fr" | "en";
 }
 
-export default function EventDetails({ event }: EventDetailsProps) {
+export default function EventDetails({
+  event,
+  lang = "fr",
+}: EventDetailsProps) {
   const {
     title,
     city,
@@ -22,6 +26,34 @@ export default function EventDetails({ event }: EventDetailsProps) {
     registration_url,
     description,
   } = event;
+
+  const t = {
+    date: lang === "en" ? "Date & Time" : "Date et heure",
+    location: lang === "en" ? "Location" : "Localisation",
+    distance: lang === "en" ? "Distance" : "Distance",
+    priceLabel: lang === "en" ? "Registration Price" : "Prix d'inscription",
+    registrationOpen:
+      lang === "en" ? "Registration Open" : "Inscriptions ouvertes",
+    registrationText:
+      lang === "en"
+        ? "Registrations are currently open for this race."
+        : "Les inscriptions sont actuellement ouvertes pour cette course.",
+    registerBtn: lang === "en" ? "Register now" : "S'inscrire maintenant",
+    info: lang === "en" ? "Important Information" : "Informations importantes",
+    tips:
+      lang === "en"
+        ? [
+            "Arrive 30 minutes before the start",
+            "Bring your running gear",
+            "Check the weather forecast",
+          ]
+        : [
+            "Arrivez 30 minutes avant le départ",
+            "Apportez votre équipement de course",
+            "Consultez la météo avant de partir",
+          ],
+    description: lang === "en" ? "Description" : "Description",
+  };
 
   return (
     <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
@@ -39,27 +71,30 @@ export default function EventDetails({ event }: EventDetailsProps) {
       {/* Content */}
       <div className="p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Left Column - Event Info */}
+          {/* Left Column */}
           <div className="space-y-6">
             <div className="bg-gray-50 rounded-xl p-6">
               <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
                 <span className="text-2xl mr-3">📅</span>
-                Date et heure
+                {t.date}
               </h3>
               <p className="text-gray-700 text-lg font-medium">
-                {new Date(date).toLocaleDateString("fr-FR", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
+                {new Date(date).toLocaleDateString(
+                  lang === "en" ? "en-GB" : "fr-FR",
+                  {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  }
+                )}
               </p>
             </div>
 
             <div className="bg-gray-50 rounded-xl p-6">
               <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
                 <span className="text-2xl mr-3">📍</span>
-                Localisation
+                {t.location}
               </h3>
               <p className="text-gray-700 text-lg font-medium">
                 {city}, {region}
@@ -69,20 +104,20 @@ export default function EventDetails({ event }: EventDetailsProps) {
             <div className="bg-gray-50 rounded-xl p-6">
               <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
                 <span className="text-2xl mr-3">📏</span>
-                Distance
+                {t.distance}
               </h3>
               <p className="text-gray-700 text-lg font-medium">
-                {distance_km} kilomètres
+                {distance_km} km
               </p>
             </div>
           </div>
 
-          {/* Right Column - Registration Info */}
+          {/* Right Column */}
           <div className="space-y-6">
             <div className="bg-gray-50 rounded-xl p-6">
               <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
                 <span className="text-2xl mr-3">💶</span>
-                Prix d'inscription
+                {t.priceLabel}
               </h3>
               <p className="text-gray-700 text-lg font-medium">{price}</p>
             </div>
@@ -90,18 +125,16 @@ export default function EventDetails({ event }: EventDetailsProps) {
             <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
               <h3 className="text-xl font-semibold text-green-900 mb-4 flex items-center">
                 <span className="text-2xl mr-3">✅</span>
-                Inscriptions ouvertes
+                {t.registrationOpen}
               </h3>
-              <p className="text-green-700 mb-4">
-                Les inscriptions sont actuellement ouvertes pour cette course.
-              </p>
+              <p className="text-green-700 mb-4">{t.registrationText}</p>
               <a
                 href={registration_url}
                 className="inline-flex items-center justify-center w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-colors duration-300 shadow-lg hover:shadow-xl"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <span>S'inscrire maintenant</span>
+                <span>{t.registerBtn}</span>
                 <svg
                   className="w-5 h-5 ml-2"
                   fill="none"
@@ -121,32 +154,25 @@ export default function EventDetails({ event }: EventDetailsProps) {
             <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
               <h3 className="text-xl font-semibold text-blue-900 mb-4 flex items-center">
                 <span className="text-2xl mr-3">ℹ️</span>
-                Informations importantes
+                {t.info}
               </h3>
               <ul className="text-blue-700 space-y-2">
-                <li className="flex items-start">
-                  <span className="text-blue-500 mr-2">•</span>
-                  Arrivez 30 minutes avant le départ
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-500 mr-2">•</span>
-                  Apportez votre équipement de course
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-500 mr-2">•</span>
-                  Consultez la météo avant de partir
-                </li>
+                {t.tips.map((tip, i) => (
+                  <li key={i} className="flex items-start">
+                    <span className="text-blue-500 mr-2">•</span>
+                    {tip}
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
         </div>
 
-        {/* Description Section */}
         {description && (
           <div className="mt-8 pt-8 border-t border-gray-200">
             <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
               <span className="text-2xl mr-3">📝</span>
-              Description
+              {t.description}
             </h3>
             <div className="bg-gray-50 rounded-xl p-6">
               <p className="text-gray-700 leading-relaxed text-lg">

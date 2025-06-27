@@ -132,7 +132,7 @@ export default async function RegionPage({ params }: Props) {
               courses à pied disponibles.
             </p>
           </div>
-          <CityList cities={cities} />
+          <CityList cities={cities} lang="fr" />
         </div>
       </section>
 
@@ -157,6 +157,7 @@ export default async function RegionPage({ params }: Props) {
                   event={evt}
                   regionSlug={region}
                   city={{ slug: evt.city_slug }}
+                  lang="fr"
                 />
               ))}
             </div>

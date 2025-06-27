@@ -108,6 +108,7 @@ export default async function CityPage({ params }: Props) {
                   event={event}
                   regionSlug={region}
                   city={{ slug: city }}
+                  lang="fr"
                 />
               ))}
             </div>
