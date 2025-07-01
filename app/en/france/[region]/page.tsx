@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import CityList from "@/components/CityList";
 import EventCard from "@/components/EventCard";
+import { City, Event, SupabaseResponse } from "@/types/types";
 
 interface Props {
   params: Promise<{ region: string }>;
@@ -21,10 +22,9 @@ export async function generateMetadata({
 export default async function RegionPage({ params }: Props) {
   const { region } = await params;
 
-  const { data: cities, error: citiesError } = await supabase
-    .from("cities")
-    .select("*")
-    .eq("region_slug", region);
+  // Fetch cities with explicit typing
+  const { data: cities, error: citiesError }: SupabaseResponse<City> =
+    await supabase.from("cities").select("*").eq("region_slug", region);
 
   if (citiesError) {
     console.error("Supabase error (cities):", citiesError.message);
@@ -43,13 +43,11 @@ export default async function RegionPage({ params }: Props) {
     );
   }
 
-  const { data: events, error: eventsError } = await supabase
-    .from("events")
-    .select("*")
-    .in(
-      "city_slug",
-      cities.map((city) => city.slug)
-    );
+  const citySlugs: string[] = cities?.map((city: City) => city.slug) || [];
+
+  // Fetch events with explicit typing
+  const { data: events, error: eventsError }: SupabaseResponse<Event> =
+    await supabase.from("events").select("*").in("city_slug", citySlugs);
 
   if (eventsError) {
     console.error("Supabase error (events):", eventsError.message);
@@ -131,7 +129,7 @@ export default async function RegionPage({ params }: Props) {
               running races.
             </p>
           </div>
-          <CityList cities={cities} lang="en" />
+          <CityList cities={cities || []} lang="en" />
         </div>
       </section>
 
@@ -150,12 +148,12 @@ export default async function RegionPage({ params }: Props) {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {events.map((evt) => (
+              {events.map((evt: Event) => (
                 <EventCard
                   key={evt.id}
                   event={evt}
                   regionSlug={region}
-                  city={{ slug: evt.city_slug }}
+                  city={{ slug: evt.city_slug || "" }}
                   lang="en"
                 />
               ))}

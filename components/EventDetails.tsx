@@ -1,16 +1,4 @@
-interface EventDetailsProps {
-  event: {
-    title: string;
-    city: string;
-    region: string;
-    date: string;
-    distance_km: number;
-    price: string;
-    registration_url: string;
-    description: string;
-  };
-  lang?: "fr" | "en";
-}
+import { EventDetailsProps } from "@/types/types";
 
 export default function EventDetails({
   event,

@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { Event, SupabaseSingleResponse } from "@/types/types";
 
 interface Props {
   params: Promise<{ region: string; city: string; event: string }>;
@@ -7,7 +8,7 @@ interface Props {
 export const generateMetadata = async ({ params }: Props) => {
   const { event } = await params;
 
-  const { data: eventData } = await supabase
+  const { data: eventData }: SupabaseSingleResponse<Event> = await supabase
     .from("events")
     .select("*")
     .eq("slug", event)
@@ -24,11 +25,8 @@ export const generateMetadata = async ({ params }: Props) => {
 export default async function EventDetails({ params }: Props) {
   const { event } = await params;
 
-  const { data: eventData, error } = await supabase
-    .from("events")
-    .select("*")
-    .eq("slug", event)
-    .single();
+  const { data: eventData, error }: SupabaseSingleResponse<Event> =
+    await supabase.from("events").select("*").eq("slug", event).single();
 
   if (error || !eventData) {
     console.error("Supabase error:", error?.message);

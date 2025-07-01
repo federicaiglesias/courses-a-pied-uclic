@@ -1,22 +1,27 @@
 import { supabase } from "@/lib/supabase";
 import EventCard from "@/components/EventCard";
+import { Event, SupabaseResponse } from "@/types/types";
 
 interface Props {
   params: Promise<{ region: string; city: string }>;
 }
 
-export const generateMetadata = async ({ params }: Props) => {
-  const { city } = await params;
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ region: string; city: string }>;
+}) {
+  const { region, city } = await params;
   return {
-    title: `Courses à ${city}`,
-    description: `Découvrez toutes les courses à pied organisées à ${city}.`,
+    title: `Courses à pied à ${city}`,
+    description: `Trouvez toutes les courses à pied organisées à ${city}`,
   };
-};
+}
 
 export default async function CityPage({ params }: Props) {
   const { region, city } = await params;
 
-  const { data: events, error } = await supabase
+  const { data: events, error }: SupabaseResponse<Event> = await supabase
     .from("events")
     .select("*")
     .eq("city_slug", city);
@@ -102,7 +107,7 @@ export default async function CityPage({ params }: Props) {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {events.map((event) => (
+              {events.map((event: Event) => (
                 <EventCard
                   key={event.slug}
                   event={event}

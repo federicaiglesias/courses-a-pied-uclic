@@ -1,14 +1,6 @@
-interface Region {
-  slug: string;
-  name: string;
-}
+import { RegionListProps } from "@/types/types";
 
-interface Props {
-  regions: Region[];
-  lang?: "fr" | "en";
-}
-
-export default function RegionList({ regions, lang = "fr" }: Props) {
+export default function RegionList({ regions, lang = "fr" }: RegionListProps) {
   const exploreText = lang === "en" ? "Explore" : "Explorer";
 
   return (
@@ -18,14 +10,10 @@ export default function RegionList({ regions, lang = "fr" }: Props) {
           key={region.slug}
           href={`/${lang}/france/${region.slug}`}
           className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden border border-gray-100"
-          style={{
-            animationDelay: `${index * 100}ms`,
-          }}
+          style={{ animationDelay: `${index * 100}ms` }}
         >
-          {/* Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-          {/* Card Content */}
           <div className="relative p-8 text-center">
             <div className="mb-6">
               <span className="text-6xl group-hover:scale-110 transition-transform duration-300 block">
@@ -55,8 +43,7 @@ export default function RegionList({ regions, lang = "fr" }: Props) {
             </div>
           </div>
 
-          {/* Hover Effect Border */}
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
         </a>
       ))}
     </div>

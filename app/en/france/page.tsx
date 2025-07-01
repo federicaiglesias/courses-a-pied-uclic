@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import RegionList from "@/components/RegionList";
 import EventCard from "@/components/EventCard";
+import { Region, City, Event, SupabaseResponse } from "@/types/types";
 
 export const metadata = {
   title: "Courses à pied en France",
@@ -9,10 +10,9 @@ export const metadata = {
 };
 
 export default async function FrancePage() {
-  const { data: regions, error: regionsError } = await supabase
-    .from("regions")
-    .select("*")
-    .eq("country_slug", "france");
+  // Fetch regions with explicit typing
+  const { data: regions, error: regionsError }: SupabaseResponse<Region> =
+    await supabase.from("regions").select("*").eq("country_slug", "france");
 
   if (regionsError) {
     console.error("Erreur Supabase (regions):", regionsError.message);
@@ -31,9 +31,7 @@ export default async function FrancePage() {
     );
   }
 
-  const regionSlugs = regions.map((region) => region.slug);
-
-  if (regionSlugs.length === 0) {
+  if (!regions || regions.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-orange-100 flex items-center justify-center">
         <div className="text-center p-8">
@@ -49,10 +47,11 @@ export default async function FrancePage() {
     );
   }
 
-  const { data: cities, error: citiesError } = await supabase
-    .from("cities")
-    .select("*")
-    .in("region_slug", regionSlugs);
+  const regionSlugs: string[] = regions.map((region: Region) => region.slug);
+
+  // Fetch cities with explicit typing
+  const { data: cities, error: citiesError }: SupabaseResponse<City> =
+    await supabase.from("cities").select("*").in("region_slug", regionSlugs);
 
   if (citiesError) {
     console.error("Erreur Supabase (cities):", citiesError.message);
@@ -61,7 +60,7 @@ export default async function FrancePage() {
         <div className="text-center p-8">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h2 className="text-2xl font-bold text-red-800 mb-2">
-            No regions found.
+            Connection error.
           </h2>
           <p className="text-red-600">
             Unable to load the cities. Please try again later.
@@ -71,15 +70,13 @@ export default async function FrancePage() {
     );
   }
 
-  const citySlugs = cities.map((city) => city.slug);
-
-  if (citySlugs.length === 0) {
+  if (!cities || cities.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-orange-100 flex items-center justify-center">
         <div className="text-center p-8">
           <div className="text-yellow-500 text-6xl mb-4">🏃‍♂️</div>
           <h2 className="text-2xl font-bold text-yellow-800 mb-2">
-            No cities found. No cities found.
+            No cities found.
           </h2>
           <p className="text-yellow-600">
             No cities are available for the regions of France.
@@ -89,10 +86,11 @@ export default async function FrancePage() {
     );
   }
 
-  const { data: events, error: eventsError } = await supabase
-    .from("events")
-    .select("*")
-    .in("city_slug", citySlugs);
+  const citySlugs: string[] = cities.map((city: City) => city.slug);
+
+  // Fetch events with explicit typing
+  const { data: events, error: eventsError }: SupabaseResponse<Event> =
+    await supabase.from("events").select("*").in("city_slug", citySlugs);
 
   if (eventsError) {
     console.error("Erreur Supabase (events):", eventsError.message);
@@ -211,14 +209,16 @@ export default async function FrancePage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {events.map((evt) => {
-                const city = cities.find((c) => c.slug === evt.city_slug);
+              {events.map((evt: Event) => {
+                const city: City | undefined = cities.find(
+                  (c: City) => c.slug === evt.city_slug
+                );
                 return (
                   <EventCard
                     key={evt.id}
                     event={evt}
                     regionSlug={city?.region_slug || ""}
-                    city={{ slug: evt.city_slug }}
+                    city={{ slug: evt.city_slug || "" }}
                     lang="en"
                   />
                 );

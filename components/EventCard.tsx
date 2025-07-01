@@ -1,20 +1,4 @@
-interface Event {
-  slug: string;
-  title: string;
-  date: string;
-  distance_km: number;
-  price: string;
-  registration_url: string;
-}
-
-interface EventCardProps {
-  event: Event;
-  regionSlug: string;
-  city: {
-    slug: string;
-  };
-  lang?: "fr" | "en";
-}
+import { EventCardProps } from "@/types/types";
 
 export default function EventCard({
   event,
@@ -28,7 +12,7 @@ export default function EventCard({
   return (
     <div className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden border border-gray-100">
       {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
       {/* Card Content */}
       <div className="relative p-6">
@@ -40,18 +24,18 @@ export default function EventCard({
         </div>
 
         {/* Event Details */}
-        <div className="space-y-3 mb-6">
-          <div className="flex items-center space-x-3 text-gray-600">
+        <div className="space-y-3 mb-6 text-gray-600">
+          <div className="flex items-center space-x-3">
             <span className="text-xl">📅</span>
             <span className="font-medium">{event.date}</span>
           </div>
 
-          <div className="flex items-center space-x-3 text-gray-600">
+          <div className="flex items-center space-x-3">
             <span className="text-xl">📏</span>
             <span className="font-medium">{event.distance_km} km</span>
           </div>
 
-          <div className="flex items-center space-x-3 text-gray-600">
+          <div className="flex items-center space-x-3">
             <span className="text-xl">💶</span>
             <span className="font-medium">{event.price}</span>
           </div>
@@ -112,7 +96,7 @@ export default function EventCard({
       </div>
 
       {/* Hover Effect Border */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
     </div>
   );
 }

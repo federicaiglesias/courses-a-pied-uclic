@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { Country, SupabaseResponse } from "@/types/types";
 
 export const metadata = {
   title: "Courses à pied – Accueil",
@@ -6,7 +7,7 @@ export const metadata = {
 };
 
 export default async function CountryPage() {
-  const { data: countries, error } = await supabase
+  const { data: countries, error }: SupabaseResponse<Country> = await supabase
     .from("countries")
     .select("*");
 
@@ -95,7 +96,7 @@ export default async function CountryPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {countries?.map((country, index) => (
+            {countries?.map((country: Country, index: number) => (
               <a
                 key={country.slug}
                 href={`/fr/${country.slug}`}
