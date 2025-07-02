@@ -117,3 +117,13 @@ export type SupabaseSingleResponse<T> = {
     code?: string;
   } | null;
 };
+export type PageBlock = {
+  id: string;
+  page_slug: string;
+  type: "text" | "hero" | "list_events";
+  order: number;
+  markdown?: string;
+  title?: string;
+  subtitle?: string;
+  content?: Record<string, any>;
+};
