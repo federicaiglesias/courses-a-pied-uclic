@@ -3,6 +3,11 @@ import RegionList from "@/components/RegionList";
 import EventCard from "@/components/EventCard";
 import { Region, City, Event, SupabaseResponse } from "@/types/types";
 
+type PageProps = {
+  params: {
+    lang: "fr" | "en";
+  };
+};
 
 const translations = {
   fr: {
@@ -137,11 +142,7 @@ const translations = {
   },
 };
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { lang: "fr" | "en" };
-}) {
+export async function generateMetadata({ params }: PageProps) {
   const t = translations[params.lang];
   return {
     title: t.metadata.title,
@@ -149,14 +150,9 @@ export async function generateMetadata({
   };
 }
 
-export default async function FrancePage({
-  params,
-}: {
-  params: { lang: "fr" | "en" };
-}) {
+export default async function FrancePage({ params }: PageProps) {
   const t = translations[params.lang];
 
-  // Fetch regions with explicit typing
   const { data: regions, error: regionsError }: SupabaseResponse<Region> =
     await supabase.from("regions").select("*").eq("country_slug", "france");
 
@@ -177,8 +173,6 @@ export default async function FrancePage({
 
   const regionSlugs: string[] =
     regions?.map((region: Region) => region.slug) || [];
-
-  // Verificar que hay regiones antes de buscar ciudades
   if (regionSlugs.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-orange-100 flex items-center justify-center">
@@ -193,7 +187,6 @@ export default async function FrancePage({
     );
   }
 
-  // Fetch cities with explicit typing
   const { data: cities, error: citiesError }: SupabaseResponse<City> =
     await supabase.from("cities").select("*").in("region_slug", regionSlugs);
 
@@ -227,8 +220,6 @@ export default async function FrancePage({
       </div>
     );
   }
-
-  // Fetch events with explicit typing
   const { data: events, error: eventsError }: SupabaseResponse<Event> =
     await supabase.from("events").select("*").in("city_slug", citySlugs);
 
@@ -244,26 +235,6 @@ export default async function FrancePage({
           <p className="text-red-600">{t.error.eventsMessage}</p>
         </div>
       </div>
-    );
-  }
-
-  // Verificar que hay eventos
-  if (!events || events.length === 0) {
-    return (
-      <main className="py-16 px-6 bg-gray-50">
-        <section className="max-w-4xl mx-auto text-center mb-16">
-          <h2 className="text-3xl font-bold text-blue-800 mb-10">
-            {t.regions.title}
-          </h2>
-          <RegionList regions={regions || []} lang={params.lang} />
-        </section>
-        <section className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-blue-800 mb-10">
-            {t.events.title}
-          </h2>
-          <p>{t.events.noEvents.message}</p>
-        </section>
-      </main>
     );
   }
 
