@@ -1,11 +1,15 @@
 import Link from "next/link";
 
-export default function NotFound({
+export default async function NotFound({
   params,
 }: {
-  params: { lang: "fr" | "en" };
+  params: Promise<{ lang: "fr" | "en" }>;
 }) {
-  const isFr = params.lang === "fr";
+  if (!params) {
+    return null;
+  }
+  const { lang } = await params;
+  const isFr = lang === "fr";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center px-6">
@@ -31,7 +35,7 @@ export default function NotFound({
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href={`/${params.lang}`}
+            href={`/${lang}`}
             className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold rounded-full hover:from-blue-700 hover:to-indigo-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
           >
             <span>{isFr ? "Retour à l'accueil" : "Back to home"}</span>

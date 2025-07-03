@@ -120,9 +120,13 @@ export async function generateStaticParams() {
 export default async function Home({
   params,
 }: {
-  params: { lang: "fr" | "en" };
+  params: Promise<{ lang: "fr" | "en" }>;
 }) {
-  const t = translations[params.lang];
+  if (!params) {
+    return null;
+  }
+  const { lang } = await params;
+  const t = translations[lang];
 
   const { data: countries, error }: SupabaseResponse<Country> = await supabase
     .from("countries")
@@ -210,7 +214,7 @@ export default async function Home({
             {countries?.map((country: Country, index: number) => (
               <a
                 key={country.slug}
-                href={`/${params.lang}/${country.slug}`}
+                href={`/${lang}/${country.slug}`}
                 className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden border border-gray-100 animate-fade-in"
               >
                 {/* Gradient Overlay */}

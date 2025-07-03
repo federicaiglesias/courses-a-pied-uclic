@@ -4,9 +4,9 @@ import EventCard from "@/components/EventCard";
 import { Region, City, Event, SupabaseResponse } from "@/types/types";
 
 type PageProps = {
-  params: {
+  params: Promise<{
     lang: "fr" | "en";
-  };
+  }>;
 };
 
 const translations = {
@@ -143,7 +143,15 @@ const translations = {
 };
 
 export async function generateMetadata({ params }: PageProps) {
-  const t = translations[params.lang];
+  if (!params) {
+    return {
+      title: "Courses à pied en France",
+      description:
+        "Trouvez toutes les courses à pied organisées en France par région.",
+    };
+  }
+  const { lang } = await params;
+  const t = translations[lang];
   return {
     title: t.metadata.title,
     description: t.metadata.description,
@@ -151,7 +159,11 @@ export async function generateMetadata({ params }: PageProps) {
 }
 
 export default async function FrancePage({ params }: PageProps) {
-  const t = translations[params.lang];
+  if (!params) {
+    return null;
+  }
+  const { lang } = await params;
+  const t = translations[lang];
 
   const { data: regions, error: regionsError }: SupabaseResponse<Region> =
     await supabase.from("regions").select("*").eq("country_slug", "france");
@@ -298,7 +310,7 @@ export default async function FrancePage({ params }: PageProps) {
               {t.regions.description}
             </p>
           </div>
-          <RegionList regions={regions || []} lang={params.lang} />
+          <RegionList regions={regions || []} lang={lang} />
         </div>
       </section>
 
@@ -326,7 +338,7 @@ export default async function FrancePage({ params }: PageProps) {
                     event={evt}
                     regionSlug={city?.region_slug || ""}
                     city={{ slug: evt.city_slug || "" }}
-                    lang={params.lang}
+                    lang={lang}
                   />
                 );
               })}
@@ -353,7 +365,7 @@ export default async function FrancePage({ params }: PageProps) {
                 {t.events.noEvents.stayInformed.message}
               </p>
               <a
-                href={`/${params.lang}`}
+                href={`/${lang}`}
                 className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-300"
               >
                 <span>{t.events.noEvents.stayInformed.button}</span>
