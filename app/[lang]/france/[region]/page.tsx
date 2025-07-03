@@ -133,6 +133,39 @@ export default async function RegionPage({ params }: Props) {
   const { region, lang } = await params;
   const t = translations[lang];
 
+  // Verificar si la región existe
+  const { data: regionData, error: regionError } = await supabase
+    .from("regions")
+    .select("slug")
+    .eq("slug", region)
+    .eq("country_slug", "france")
+    .single();
+
+  if (regionError || !regionData) {
+    // Si la región no existe, mostrar not-found
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
+        <div className="text-center p-8">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-bold text-red-800 mb-2">
+            {lang === "fr" ? "Région introuvable" : "Region not found"}
+          </h2>
+          <p className="text-red-600">
+            {lang === "fr"
+              ? `La région "${region}" n'existe pas.`
+              : `The region "${region}" does not exist.`}
+          </p>
+          <a
+            href={`/${lang}/france`}
+            className="inline-block mt-4 px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+          >
+            {lang === "fr" ? "Retour à la France" : "Back to France"}
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   const { data: cities, error: citiesError }: SupabaseResponse<City> =
     await supabase.from("cities").select("*").eq("region_slug", region);
 

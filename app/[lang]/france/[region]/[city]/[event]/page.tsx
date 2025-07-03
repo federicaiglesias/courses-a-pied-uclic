@@ -169,11 +169,48 @@ export const generateMetadata = async ({ params }: Props) => {
 };
 
 export default async function EventDetails({ params }: Props) {
-  const { event, lang } = await params;
+  const { region, city, event, lang } = await params;
   const t = translations[lang];
 
+  // Verificar que el evento existe y pertenece a la ciudad correcta
   const { data: eventData, error }: SupabaseSingleResponse<Event> =
-    await supabase.from("events").select("*").eq("slug", event).single();
+    await supabase
+      .from("events")
+      .select("*")
+      .eq("slug", event)
+      .eq("city_slug", city)
+      .single();
+
+  // Verificar que la ciudad pertenece a la región correcta
+  const { data: cityData } = await supabase
+    .from("cities")
+    .select("region_slug")
+    .eq("slug", city)
+    .single();
+
+  if (cityData?.region_slug !== region) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
+        <div className="text-center p-8">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-bold text-red-800 mb-2">
+            {lang === "fr" ? "Événement introuvable" : "Event not found"}
+          </h2>
+          <p className="text-red-600">
+            {lang === "fr"
+              ? `L'événement "${event}" n'existe pas dans cette ville et région.`
+              : `The event "${event}" does not exist in this city and region.`}
+          </p>
+          <a
+            href={`/${lang}/france/${region}/${city}`}
+            className="inline-block mt-4 px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+          >
+            {lang === "fr" ? "Retour à la ville" : "Back to city"}
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   if (error || !eventData) {
     console.error("Erreur Supabase:", error?.message);

@@ -116,6 +116,39 @@ export default async function CityPage({ params }: Props) {
   const { region, city, lang } = await params;
   const t = translations[lang];
 
+  // Verificar si la ciudad existe y pertenece a la región
+  const { data: cityData, error: cityError } = await supabase
+    .from("cities")
+    .select("slug, region_slug")
+    .eq("slug", city)
+    .eq("region_slug", region)
+    .single();
+
+  if (cityError || !cityData) {
+    // Si la ciudad no existe o no pertenece a la región, mostrar not-found
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
+        <div className="text-center p-8">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-bold text-red-800 mb-2">
+            {lang === "fr" ? "Ville introuvable" : "City not found"}
+          </h2>
+          <p className="text-red-600">
+            {lang === "fr"
+              ? `La ville "${city}" n'existe pas dans la région "${region}".`
+              : `The city "${city}" does not exist in the region "${region}".`}
+          </p>
+          <a
+            href={`/${lang}/france/${region}`}
+            className="inline-block mt-4 px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+          >
+            {lang === "fr" ? "Retour à la région" : "Back to region"}
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   const { data, error } = await supabase
     .from("events")
     .select("*, event_i18n(*)")
