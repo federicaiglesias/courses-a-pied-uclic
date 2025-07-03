@@ -2,29 +2,133 @@ import { supabase } from "@/lib/supabase";
 import EventCard from "@/components/EventCard";
 import { Event, SupabaseResponse } from "@/types/types";
 
+// Translations object
+const translations = {
+  fr: {
+    metadata: {
+      title: "Courses à pied à {city}",
+      description: "Trouvez toutes les courses à pied organisées à {city}",
+    },
+    error: {
+      title: "Erreur de connexion",
+      message:
+        "Impossible de charger les événements. Veuillez réessayer plus tard.",
+    },
+    hero: {
+      title: {
+        city: "{city}",
+        running: "Courses à pied",
+      },
+      subtitle: "Découvrez les meilleures courses à pied organisées à {city}.",
+      subtitle2: "Une ville, des courses, des défis à relever.",
+      stats: {
+        events: "événements",
+        region: "Région {region}",
+        city: "Ville {city}",
+      },
+    },
+    events: {
+      title: "Courses à pied à {city}",
+      description:
+        "Découvrez notre sélection des meilleures courses à pied organisées à {city}.",
+      noEvents: {
+        title: "Aucun événement trouvé",
+        message:
+          "Il n'y a actuellement aucun événement de course à pied programmé à {city}.",
+        stayInformed: {
+          title: "Restez informé !",
+          message:
+            "Nous ajoutons régulièrement de nouveaux événements. Revenez bientôt !",
+          button: "Retour à la région",
+        },
+      },
+    },
+    cta: {
+      title: "Prêt à courir à {city} ?",
+      description:
+        "Rejoignez des milliers de coureurs qui participent aux meilleures courses de cette ville.",
+      button: "Voir les événements",
+    },
+  },
+  en: {
+    metadata: {
+      title: "Running events in {city}",
+      description: "Find all running events organized in {city}",
+    },
+    error: {
+      title: "Connection Error",
+      message: "Unable to load events. Please try again later.",
+    },
+    hero: {
+      title: {
+        city: "{city}",
+        running: "Running events",
+      },
+      subtitle: "Discover the best running events organized in {city}.",
+      subtitle2: "One city, races, challenges to overcome.",
+      stats: {
+        events: "events",
+        region: "{region} Region",
+        city: "{city} City",
+      },
+    },
+    events: {
+      title: "Running events in {city}",
+      description:
+        "Discover our selection of the best running events organized in {city}.",
+      noEvents: {
+        title: "No events found",
+        message: "There are currently no running events scheduled in {city}.",
+        stayInformed: {
+          title: "Stay informed!",
+          message: "We regularly add new events. Come back soon!",
+          button: "Back to region",
+        },
+      },
+    },
+    cta: {
+      title: "Ready to run in {city}?",
+      description:
+        "Join thousands of runners who participate in the best races in this city.",
+      button: "View events",
+    },
+  },
+};
+
 interface Props {
-  params: Promise<{ region: string; city: string }>;
+  params: Promise<{ region: string; city: string; lang: "fr" | "en" }>;
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ region: string; city: string }>;
+  params: Promise<{ region: string; city: string; lang: "fr" | "en" }>;
 }) {
-  const { region, city } = await params;
+  const { region, city, lang } = await params;
+  const t = translations[lang];
   return {
-    title: `Courses à pied à ${city}`,
-    description: `Trouvez toutes les courses à pied organisées à ${city}`,
+    title: t.metadata.title.replace("{city}", city),
+    description: t.metadata.description.replace("{city}", city),
   };
 }
 
 export default async function CityPage({ params }: Props) {
-  const { region, city } = await params;
+  const { region, city, lang } = await params;
+  const t = translations[lang];
 
-  const { data: events, error }: SupabaseResponse<Event> = await supabase
+  const { data, error } = await supabase
     .from("events")
-    .select("*")
+    .select("*, event_i18n(*)")
     .eq("city_slug", city);
+
+  const events = (data || []).map((event: any) => {
+    const i18n = event.event_i18n?.find((i: any) => i.lang === lang);
+    return {
+      ...event,
+      title: i18n?.title || event.title,
+      description: i18n?.description || "", // podés guardar esto si lo usás
+    };
+  });
 
   if (error) {
     console.error("Erreur Supabase:", error.message);
@@ -33,11 +137,9 @@ export default async function CityPage({ params }: Props) {
         <div className="text-center p-8">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h2 className="text-2xl font-bold text-red-800 mb-2">
-            Erreur de connexion
+            {t.error.title}
           </h2>
-          <p className="text-red-600">
-            Impossible de charger les événements. Veuillez réessayer plus tard.
-          </p>
+          <p className="text-red-600">{t.error.message}</p>
         </div>
       </div>
     );
@@ -59,17 +161,17 @@ export default async function CityPage({ params }: Props) {
 
           <h1 className="text-5xl md:text-6xl font-black mb-6 tracking-tight leading-tight">
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-100">
-              {city}
+              {t.hero.title.city.replace("{city}", city)}
             </span>
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-300">
-              Courses à pied
+              {t.hero.title.running}
             </span>
           </h1>
 
           <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-8 text-blue-100 leading-relaxed">
-            Découvrez les meilleures courses à pied organisées à {city}.
+            {t.hero.subtitle.replace("{city}", city)}
             <span className="block mt-2 text-lg text-blue-200">
-              Une ville, des courses, des défis à relever.
+              {t.hero.subtitle2}
             </span>
           </p>
 
@@ -77,16 +179,20 @@ export default async function CityPage({ params }: Props) {
             <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
               <span className="text-2xl">🏃‍♂️</span>
               <span className="font-semibold">
-                {events?.length || 0} événements
+                {events?.length || 0} {t.hero.stats.events}
               </span>
             </div>
             <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
               <span className="text-2xl">🗺️</span>
-              <span className="font-semibold">Région {region}</span>
+              <span className="font-semibold">
+                {t.hero.stats.region.replace("{region}", region)}
+              </span>
             </div>
             <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
               <span className="text-2xl">🌟</span>
-              <span className="font-semibold">Ville {city}</span>
+              <span className="font-semibold">
+                {t.hero.stats.city.replace("{city}", city)}
+              </span>
             </div>
           </div>
         </div>
@@ -98,11 +204,10 @@ export default async function CityPage({ params }: Props) {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                Courses à pied à {city}
+                {t.events.title.replace("{city}", city)}
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Découvrez notre sélection des meilleures courses à pied
-                organisées à {city}.
+                {t.events.description.replace("{city}", city)}
               </p>
             </div>
 
@@ -113,7 +218,7 @@ export default async function CityPage({ params }: Props) {
                   event={event}
                   regionSlug={region}
                   city={{ slug: city }}
-                  lang="fr"
+                  lang={lang}
                 />
               ))}
             </div>
@@ -126,25 +231,23 @@ export default async function CityPage({ params }: Props) {
               <span className="text-6xl mb-4 block">🏃‍♂️</span>
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-6">
-              Aucun événement trouvé
+              {t.events.noEvents.title}
             </h2>
             <p className="text-xl text-gray-600 mb-8">
-              Il n'y a actuellement aucun événement de course à pied programmé à{" "}
-              {city}.
+              {t.events.noEvents.message.replace("{city}", city)}
             </p>
             <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                Restez informé !
+                {t.events.noEvents.stayInformed.title}
               </h3>
               <p className="text-gray-600 mb-6">
-                Nous ajoutons régulièrement de nouveaux événements. Revenez
-                bientôt !
+                {t.events.noEvents.stayInformed.message}
               </p>
               <a
-                href={`/fr/france/${region}`}
+                href={`/${lang}/france/${region}`}
                 className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-300"
               >
-                <span>Retour à la région</span>
+                <span>{t.events.noEvents.stayInformed.button}</span>
                 <svg
                   className="w-4 h-4 ml-2"
                   fill="none"
@@ -168,18 +271,17 @@ export default async function CityPage({ params }: Props) {
       <section className="py-20 px-6 bg-gradient-to-r from-blue-600 to-indigo-700">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold text-white mb-6">
-            Prêt à courir à {city} ?
+            {t.cta.title.replace("{city}", city)}
           </h2>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Rejoignez des milliers de coureurs qui participent aux meilleures
-            courses de cette ville.
+            {t.cta.description}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="#events"
               className="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 font-bold rounded-full hover:bg-gray-100 transition-colors duration-300 shadow-lg hover:shadow-xl"
             >
-              <span>Voir les événements</span>
+              <span>{t.cta.button}</span>
               <svg
                 className="w-5 h-5 ml-2"
                 fill="none"

@@ -1,12 +1,129 @@
-import { supabase } from "@/lib/supabase";
+import { headers } from "next/headers";
 import { Country, SupabaseResponse } from "@/types/types";
+import { supabase } from "@/lib/supabase";
 
-export const metadata = {
-  title: "Courses à pied – Accueil",
-  description: "Découvrez les courses à pied organisées par pays.",
+// Translations object
+const translations = {
+  fr: {
+    error: {
+      title: "Erreur de connexion",
+      message:
+        "Impossible de charger les données. Veuillez réessayer plus tard.",
+    },
+    hero: {
+      title: {
+        run: "Cours.",
+        breathe: "Respire.",
+        win: "Gagne.",
+      },
+      subtitle:
+        "Découvrez et participez aux meilleures courses à pied à travers l'Europe.",
+      subtitle2: "Des événements pour tous les niveaux, de débutant à expert.",
+      stats: {
+        events: "+500 événements",
+        countries: "15 pays",
+        levels: "Tous niveaux",
+      },
+    },
+    countries: {
+      title: "Explorez les événements par pays",
+      description:
+        "Choisissez votre destination et découvrez les courses à pied qui vous attendent. De la France à l'Espagne, en passant par l'Italie et bien plus encore.",
+      discover: "Découvrir",
+    },
+    features: {
+      title: "Pourquoi choisir Courses à Pied ?",
+      description:
+        "Notre plateforme vous offre tout ce dont vous avez besoin pour vivre votre passion de la course à pied.",
+      search: {
+        title: "Recherche Facile",
+        description:
+          "Trouvez rapidement les courses qui correspondent à vos critères : distance, date, localisation.",
+      },
+      interface: {
+        title: "Interface Moderne",
+        description:
+          "Une expérience utilisateur intuitive et responsive, accessible sur tous vos appareils.",
+      },
+      quality: {
+        title: "Événements Qualité",
+        description:
+          "Une sélection rigoureuse des meilleures courses à pied organisées en Europe.",
+      },
+    },
+    cta: {
+      title: "Prêt à commencer votre aventure ?",
+      description:
+        "Rejoignez des milliers de coureurs qui ont déjà trouvé leur prochaine course sur notre plateforme.",
+      button: "Explorer les pays",
+    },
+  },
+  en: {
+    error: {
+      title: "Connection Error",
+      message: "Unable to load data. Please try again later.",
+    },
+    hero: {
+      title: {
+        run: "Run.",
+        breathe: "Breathe.",
+        win: "Win.",
+      },
+      subtitle:
+        "Discover and participate in the best running events across Europe.",
+      subtitle2: "Events for all levels, from beginner to expert.",
+      stats: {
+        events: "+500 events",
+        countries: "15 countries",
+        levels: "All levels",
+      },
+    },
+    countries: {
+      title: "Explore events by country",
+      description:
+        "Choose your destination and discover the running events waiting for you. From France to Spain, through Italy and much more.",
+      discover: "Discover",
+    },
+    features: {
+      title: "Why choose Courses à Pied?",
+      description:
+        "Our platform offers everything you need to live your passion for running.",
+      search: {
+        title: "Easy Search",
+        description:
+          "Quickly find races that match your criteria: distance, date, location.",
+      },
+      interface: {
+        title: "Modern Interface",
+        description:
+          "An intuitive and responsive user experience, accessible on all your devices.",
+      },
+      quality: {
+        title: "Quality Events",
+        description:
+          "A rigorous selection of the best running events organized in Europe.",
+      },
+    },
+    cta: {
+      title: "Ready to start your adventure?",
+      description:
+        "Join thousands of runners who have already found their next race on our platform.",
+      button: "Explore countries",
+    },
+  },
 };
 
-export default async function CountryPage() {
+export async function generateStaticParams() {
+  return [{ lang: "fr" }, { lang: "en" }];
+}
+
+export default async function Home({
+  params,
+}: {
+  params: { lang: "fr" | "en" };
+}) {
+  const t = translations[params.lang];
+
   const { data: countries, error }: SupabaseResponse<Country> = await supabase
     .from("countries")
     .select("*");
@@ -18,16 +135,13 @@ export default async function CountryPage() {
         <div className="text-center p-8">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h2 className="text-2xl font-bold text-red-800 mb-2">
-            Erreur de connexion
+            {t.error.title}
           </h2>
-          <p className="text-red-600">
-            Impossible de charger les données. Veuillez réessayer plus tard.
-          </p>
+          <p className="text-red-600">{t.error.message}</p>
         </div>
       </div>
     );
   }
-
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       {/* Hero Section */}
@@ -46,36 +160,35 @@ export default async function CountryPage() {
 
           <h1 className="text-6xl md:text-7xl font-black mb-6 tracking-tight leading-tight">
             <span className=" text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-300">
-              Cours.
+              {t.hero.title.run}
             </span>
             <span className=" text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-300">
-              Respire.
+              {t.hero.title.breathe}
             </span>
             <span className=" text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
-              Gagne.
+              {t.hero.title.win}
             </span>
           </h1>
 
           <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-8 text-blue-100 leading-relaxed">
-            Découvrez et participez aux meilleures courses à pied à travers
-            l'Europe.
+            {t.hero.subtitle}
             <span className="block mt-2 text-lg text-blue-200">
-              Des événements pour tous les niveaux, de débutant à expert.
+              {t.hero.subtitle2}
             </span>
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
               <span className="text-2xl">🎯</span>
-              <span className="font-semibold">+500 événements</span>
+              <span className="font-semibold">{t.hero.stats.events}</span>
             </div>
             <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
               <span className="text-2xl">🌍</span>
-              <span className="font-semibold">15 pays</span>
+              <span className="font-semibold">{t.hero.stats.countries}</span>
             </div>
             <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
               <span className="text-2xl">🏆</span>
-              <span className="font-semibold">Tous niveaux</span>
+              <span className="font-semibold">{t.hero.stats.levels}</span>
             </div>
           </div>
         </div>
@@ -86,12 +199,10 @@ export default async function CountryPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Explorez les événements par pays
+              {t.countries.title}
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Choisissez votre destination et découvrez les courses à pied qui
-              vous attendent. De la France à l'Espagne, en passant par l'Italie
-              et bien plus encore.
+              {t.countries.description}
             </p>
           </div>
 
@@ -99,7 +210,7 @@ export default async function CountryPage() {
             {countries?.map((country: Country, index: number) => (
               <a
                 key={country.slug}
-                href={`/fr/${country.slug}`}
+                href={`/${params.lang}/${country.slug}`}
                 className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden border border-gray-100 animate-fade-in"
               >
                 {/* Gradient Overlay */}
@@ -118,7 +229,7 @@ export default async function CountryPage() {
                   </h3>
 
                   <div className="flex items-center justify-center space-x-2 text-gray-500 group-hover:text-blue-500 transition-colors duration-300">
-                    <span className="text-sm">Découvrir</span>
+                    <span className="text-sm">{t.countries.discover}</span>
                     <svg
                       className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300"
                       fill="none"
@@ -148,11 +259,10 @@ export default async function CountryPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-6">
-              Pourquoi choisir Courses à Pied ?
+              {t.features.title}
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Notre plateforme vous offre tout ce dont vous avez besoin pour
-              vivre votre passion de la course à pied.
+              {t.features.description}
             </p>
           </div>
 
@@ -162,11 +272,10 @@ export default async function CountryPage() {
                 <span className="text-3xl">🔍</span>
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Recherche Facile
+                {t.features.search.title}
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Trouvez rapidement les courses qui correspondent à vos critères
-                : distance, date, localisation.
+                {t.features.search.description}
               </p>
             </div>
 
@@ -175,11 +284,10 @@ export default async function CountryPage() {
                 <span className="text-3xl">📱</span>
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Interface Moderne
+                {t.features.interface.title}
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Une expérience utilisateur intuitive et responsive, accessible
-                sur tous vos appareils.
+                {t.features.interface.description}
               </p>
             </div>
 
@@ -188,11 +296,10 @@ export default async function CountryPage() {
                 <span className="text-3xl">🌟</span>
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Événements Qualité
+                {t.features.quality.title}
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Une sélection rigoureuse des meilleures courses à pied
-                organisées en Europe.
+                {t.features.quality.description}
               </p>
             </div>
           </div>
@@ -202,19 +309,16 @@ export default async function CountryPage() {
       {/* CTA Section */}
       <section className="py-20 px-6 bg-gradient-to-r from-blue-600 to-indigo-700">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">
-            Prêt à commencer votre aventure ?
-          </h2>
+          <h2 className="text-4xl font-bold text-white mb-6">{t.cta.title}</h2>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Rejoignez des milliers de coureurs qui ont déjà trouvé leur
-            prochaine course sur notre plateforme.
+            {t.cta.description}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="#countries"
               className="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 font-bold rounded-full hover:bg-gray-100 transition-colors duration-300 shadow-lg hover:shadow-xl"
             >
-              <span>Explorer les pays</span>
+              <span>{t.cta.button}</span>
               <svg
                 className="w-5 h-5 ml-2"
                 fill="none"

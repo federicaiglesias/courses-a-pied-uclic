@@ -1,57 +1,140 @@
 import { supabase } from "@/lib/supabase";
-import RegionList from "@/components/RegionList";
+import CityList from "@/components/CityList";
 import EventCard from "@/components/EventCard";
-import { Region, City, Event, SupabaseResponse } from "@/types/types";
+import { City, Event, SupabaseResponse } from "@/types/types";
 
-export const metadata = {
-  title: "Courses à pied en France",
-  description:
-    "Trouvez toutes les courses à pied organisées en France par région.",
+// Translations object
+const translations = {
+  fr: {
+    metadata: {
+      title: "Courses à pied en {region}",
+      description: "Trouvez toutes les courses à pied organisées en {region}",
+    },
+    error: {
+      title: "Erreur de connexion",
+      citiesMessage:
+        "Impossible de charger les villes. Veuillez réessayer plus tard.",
+      eventsMessage:
+        "Impossible de charger les événements. Veuillez réessayer plus tard.",
+    },
+    hero: {
+      title: {
+        region: "{region}",
+        running: "Courses à pied",
+      },
+      subtitle:
+        "Découvrez les meilleures courses à pied organisées dans la région {region}.",
+      subtitle2: "Explorez les villes et trouvez votre prochaine course.",
+      stats: {
+        events: "événements",
+        cities: "villes",
+        region: "Région {region}",
+      },
+    },
+    cities: {
+      title: "Villes de la région {region}",
+      description:
+        "Explorez les villes de cette région et découvrez toutes les courses à pied disponibles.",
+    },
+    events: {
+      title: "Courses à pied en {region}",
+      description:
+        "Découvrez notre sélection des meilleures courses à pied organisées dans la région {region}.",
+      noEvents: {
+        title: "Aucun événement trouvé",
+        message:
+          "Il n'y a actuellement aucun événement de course à pied programmé dans la région {region}.",
+        stayInformed: {
+          title: "Restez informé !",
+          message:
+            "Nous ajoutons régulièrement de nouveaux événements. Revenez bientôt !",
+          button: "Retour à la France",
+        },
+      },
+    },
+    cta: {
+      title: "Prêt à courir en {region} ?",
+      description:
+        "Rejoignez des milliers de coureurs qui participent aux meilleures courses de cette région.",
+      button: "Explorer les villes",
+    },
+  },
+  en: {
+    metadata: {
+      title: "Running events in {region}",
+      description: "Find all running events organized in {region}",
+    },
+    error: {
+      title: "Connection Error",
+      citiesMessage: "Unable to load cities. Please try again later.",
+      eventsMessage: "Unable to load events. Please try again later.",
+    },
+    hero: {
+      title: {
+        region: "{region}",
+        running: "Running events",
+      },
+      subtitle:
+        "Discover the best running events organized in the {region} region.",
+      subtitle2: "Explore the cities and find your next race.",
+      stats: {
+        events: "events",
+        cities: "cities",
+        region: "{region} Region",
+      },
+    },
+    cities: {
+      title: "Cities in {region}",
+      description:
+        "Explore the cities in this region and discover all available running events.",
+    },
+    events: {
+      title: "Running events in {region}",
+      description:
+        "Discover our selection of the best running events organized in the {region} region.",
+      noEvents: {
+        title: "No events found",
+        message:
+          "There are currently no running events scheduled in the {region} region.",
+        stayInformed: {
+          title: "Stay informed!",
+          message: "We regularly add new events. Come back soon!",
+          button: "Back to France",
+        },
+      },
+    },
+    cta: {
+      title: "Ready to run in {region}?",
+      description:
+        "Join thousands of runners who participate in the best races in this region.",
+      button: "Explore cities",
+    },
+  },
 };
 
-export default async function FrancePage() {
-  // Fetch regions with explicit typing
-  const { data: regions, error: regionsError }: SupabaseResponse<Region> =
-    await supabase.from("regions").select("*").eq("country_slug", "france");
+interface Props {
+  params: Promise<{ region: string; lang: "fr" | "en" }>;
+}
 
-  if (regionsError) {
-    console.error("Erreur Supabase (regions):", regionsError.message);
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
-        <div className="text-center p-8">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold text-red-800 mb-2">
-            Connection error.
-          </h2>
-          <p className="text-red-600">
-            Unable to load the regions. Please try again later.
-          </p>
-        </div>
-      </div>
-    );
-  }
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ region: string; lang: "fr" | "en" }>;
+}) {
+  const { region, lang } = await params;
+  const t = translations[lang];
+  return {
+    title: t.metadata.title.replace("{region}", region),
+    description: t.metadata.description.replace("{region}", region),
+  };
+}
 
-  if (!regions || regions.length === 0) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-orange-100 flex items-center justify-center">
-        <div className="text-center p-8">
-          <div className="text-yellow-500 text-6xl mb-4">🏃‍♂️</div>
-          <h2 className="text-2xl font-bold text-yellow-800 mb-2">
-            No regions found.
-          </h2>
-          <p className="text-yellow-600">
-            No regions are available for France at the moment.
-          </p>
-        </div>
-      </div>
-    );
-  }
+export default async function RegionPage({ params }: Props) {
+  const { region, lang } = await params;
+  const t = translations[lang];
 
-  const regionSlugs: string[] = regions.map((region: Region) => region.slug);
-
-  // Fetch cities with explicit typing
   const { data: cities, error: citiesError }: SupabaseResponse<City> =
-    await supabase.from("cities").select("*").in("region_slug", regionSlugs);
+    await supabase.from("cities").select("*").eq("region_slug", region);
 
   if (citiesError) {
     console.error("Erreur Supabase (cities):", citiesError.message);
@@ -60,35 +143,16 @@ export default async function FrancePage() {
         <div className="text-center p-8">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h2 className="text-2xl font-bold text-red-800 mb-2">
-            Connection error.
+            {t.error.title}
           </h2>
-          <p className="text-red-600">
-            Unable to load the cities. Please try again later.
-          </p>
+          <p className="text-red-600">{t.error.citiesMessage}</p>
         </div>
       </div>
     );
   }
 
-  if (!cities || cities.length === 0) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-orange-100 flex items-center justify-center">
-        <div className="text-center p-8">
-          <div className="text-yellow-500 text-6xl mb-4">🏃‍♂️</div>
-          <h2 className="text-2xl font-bold text-yellow-800 mb-2">
-            No cities found.
-          </h2>
-          <p className="text-yellow-600">
-            No cities are available for the regions of France.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const citySlugs: string[] = cities?.map((city: City) => city.slug) || [];
 
-  const citySlugs: string[] = cities.map((city: City) => city.slug);
-
-  // Fetch events with explicit typing
   const { data: events, error: eventsError }: SupabaseResponse<Event> =
     await supabase.from("events").select("*").in("city_slug", citySlugs);
 
@@ -99,33 +163,11 @@ export default async function FrancePage() {
         <div className="text-center p-8">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h2 className="text-2xl font-bold text-red-800 mb-2">
-            Connection error.
+            {t.error.title}
           </h2>
-          <p className="text-red-600">
-            Unable to load events. Please try again later.
-          </p>
+          <p className="text-red-600">{t.error.eventsMessage}</p>
         </div>
       </div>
-    );
-  }
-
-  // Verificar que hay eventos
-  if (!events || events.length === 0) {
-    return (
-      <main className="py-16 px-6 bg-gray-50">
-        <section className="max-w-4xl mx-auto text-center mb-16">
-          <h2 className="text-3xl font-bold text-blue-800 mb-10">
-            Choose a region.
-          </h2>
-          <RegionList regions={regions} lang="en" />
-        </section>
-        <section className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-blue-800 mb-10">
-            Running races in France.
-          </h2>
-          <p>No events found for France.</p>
-        </section>
-      </main>
     );
   }
 
@@ -139,20 +181,23 @@ export default async function FrancePage() {
         </div>
 
         <div className="relative max-w-6xl mx-auto text-center">
+          <div className="mb-6">
+            <span className="inline-block text-5xl mb-4">🗺️</span>
+          </div>
+
           <h1 className="text-5xl md:text-6xl font-black mb-6 tracking-tight leading-tight">
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-100">
-              Running races.
+              {t.hero.title.region.replace("{region}", region)}
             </span>
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-300 to-red-200">
-              in France
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-300">
+              {t.hero.title.running}
             </span>
           </h1>
 
           <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-8 text-blue-100 leading-relaxed">
-            Discover the best running races organized across all regions of
-            France.
+            {t.hero.subtitle.replace("{region}", region)}
             <span className="block mt-2 text-lg text-blue-200">
-              From north to south, from east to west, find your next race.
+              {t.hero.subtitle2}
             </span>
           </p>
 
@@ -160,37 +205,37 @@ export default async function FrancePage() {
             <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
               <span className="text-2xl">🏃‍♂️</span>
               <span className="font-semibold">
-                {events?.length || 0} events
+                {events?.length || 0} {t.hero.stats.events}
               </span>
             </div>
             <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
               <span className="text-2xl">🏙️</span>
               <span className="font-semibold">
-                {cities?.length || 0} cities
+                {cities?.length || 0} {t.hero.stats.cities}
               </span>
             </div>
             <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
-              <span className="text-2xl">🗺️</span>
+              <span className="text-2xl">🌟</span>
               <span className="font-semibold">
-                {regions?.length || 0} regions
+                {t.hero.stats.region.replace("{region}", region)}
               </span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Regions Section */}
+      {/* Cities Section */}
       <section className="py-16 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Explore by region
+              {t.cities.title.replace("{region}", region)}
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Choose a French region and discover all available running races.
+              {t.cities.description}
             </p>
           </div>
-          <RegionList regions={regions} lang="en" />
+          <CityList cities={cities || []} lang={lang} />
         </div>
       </section>
 
@@ -200,29 +245,23 @@ export default async function FrancePage() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                All races in France
+                {t.events.title.replace("{region}", region)}
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Discover our selection of the best running races held across all
-                of France.
+                {t.events.description.replace("{region}", region)}
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {events.map((evt: Event) => {
-                const city: City | undefined = cities.find(
-                  (c: City) => c.slug === evt.city_slug
-                );
-                return (
-                  <EventCard
-                    key={evt.id}
-                    event={evt}
-                    regionSlug={city?.region_slug || ""}
-                    city={{ slug: evt.city_slug || "" }}
-                    lang="en"
-                  />
-                );
-              })}
+              {events.map((evt: Event) => (
+                <EventCard
+                  key={evt.id}
+                  event={evt}
+                  regionSlug={region}
+                  city={{ slug: evt.city_slug || "" }}
+                  lang={lang}
+                />
+              ))}
             </div>
           </div>
         </section>
@@ -233,23 +272,23 @@ export default async function FrancePage() {
               <span className="text-6xl mb-4 block">🏃‍♂️</span>
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-6">
-              No events found
+              {t.events.noEvents.title}
             </h2>
             <p className="text-xl text-gray-600 mb-8">
-              There are currently no running events scheduled in France.
+              {t.events.noEvents.message.replace("{region}", region)}
             </p>
             <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                Stay informed!
+                {t.events.noEvents.stayInformed.title}
               </h3>
               <p className="text-gray-600 mb-6">
-                We regularly add new events. Check back soon!
+                {t.events.noEvents.stayInformed.message}
               </p>
               <a
-                href="/fr"
+                href={`/${lang}/france`}
                 className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-300"
               >
-                <span>Back to Home</span>
+                <span>{t.events.noEvents.stayInformed.button}</span>
                 <svg
                   className="w-4 h-4 ml-2"
                   fill="none"
@@ -273,17 +312,17 @@ export default async function FrancePage() {
       <section className="py-20 px-6 bg-gradient-to-r from-blue-600 to-indigo-700">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold text-white mb-6">
-            Ready to run in France?
+            {t.cta.title.replace("{region}", region)}
           </h2>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of runners taking part in the best French races.
+            {t.cta.description}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="#regions"
+              href="#cities"
               className="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 font-bold rounded-full hover:bg-gray-100 transition-colors duration-300 shadow-lg hover:shadow-xl"
             >
-              <span>Explore regions</span>
+              <span>{t.cta.button}</span>
               <svg
                 className="w-5 h-5 ml-2"
                 fill="none"

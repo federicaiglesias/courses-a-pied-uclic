@@ -3,13 +3,159 @@ import RegionList from "@/components/RegionList";
 import EventCard from "@/components/EventCard";
 import { Region, City, Event, SupabaseResponse } from "@/types/types";
 
-export const metadata = {
-  title: "Courses à pied en France",
-  description:
-    "Trouvez toutes les courses à pied organisées en France par région.",
+
+const translations = {
+  fr: {
+    metadata: {
+      title: "Courses à pied en France",
+      description:
+        "Trouvez toutes les courses à pied organisées en France par région.",
+    },
+    error: {
+      title: "Erreur de connexion",
+      regionsMessage:
+        "Impossible de charger les régions. Veuillez réessayer plus tard.",
+      citiesMessage:
+        "Impossible de charger les villes. Veuillez réessayer plus tard.",
+      eventsMessage:
+        "Impossible de charger les événements. Veuillez réessayer plus tard.",
+    },
+    noData: {
+      regions: {
+        title: "Aucune région trouvée",
+        message:
+          "Aucune région n'est disponible pour la France pour le moment.",
+      },
+      cities: {
+        title: "Aucune ville trouvée",
+        message: "Aucune ville n'est disponible pour les régions de France.",
+      },
+    },
+    hero: {
+      title: {
+        running: "Courses à pied",
+        inFrance: "en France",
+      },
+      subtitle:
+        "Découvrez les meilleures courses à pied organisées dans toutes les régions de France.",
+      subtitle2:
+        "Du nord au sud, de l'est à l'ouest, trouvez votre prochaine course.",
+      stats: {
+        events: "événements",
+        cities: "villes",
+        regions: "régions",
+      },
+    },
+    regions: {
+      title: "Explorez par région",
+      description:
+        "Choisissez une région française et découvrez toutes les courses à pied disponibles.",
+    },
+    events: {
+      title: "Toutes les courses en France",
+      description:
+        "Découvrez notre sélection des meilleures courses à pied organisées dans toute la France.",
+      noEvents: {
+        title: "Aucun événement trouvé",
+        message:
+          "Il n'y a actuellement aucun événement de course à pied programmé en France.",
+        stayInformed: {
+          title: "Restez informé !",
+          message:
+            "Nous ajoutons régulièrement de nouveaux événements. Revenez bientôt !",
+          button: "Retour à l'accueil",
+        },
+      },
+    },
+    cta: {
+      title: "Prêt à courir en France ?",
+      description:
+        "Rejoignez des milliers de coureurs qui participent aux meilleures courses françaises.",
+      button: "Explorer les régions",
+    },
+  },
+  en: {
+    metadata: {
+      title: "Running events in France",
+      description: "Find all running events organized in France by region.",
+    },
+    error: {
+      title: "Connection Error",
+      regionsMessage: "Unable to load regions. Please try again later.",
+      citiesMessage: "Unable to load cities. Please try again later.",
+      eventsMessage: "Unable to load events. Please try again later.",
+    },
+    noData: {
+      regions: {
+        title: "No regions found",
+        message: "No regions are available for France at the moment.",
+      },
+      cities: {
+        title: "No cities found",
+        message: "No cities are available for French regions.",
+      },
+    },
+    hero: {
+      title: {
+        running: "Running events",
+        inFrance: "in France",
+      },
+      subtitle:
+        "Discover the best running events organized in all regions of France.",
+      subtitle2: "From north to south, from east to west, find your next race.",
+      stats: {
+        events: "events",
+        cities: "cities",
+        regions: "regions",
+      },
+    },
+    regions: {
+      title: "Explore by region",
+      description:
+        "Choose a French region and discover all available running events.",
+    },
+    events: {
+      title: "All races in France",
+      description:
+        "Discover our selection of the best running events organized throughout France.",
+      noEvents: {
+        title: "No events found",
+        message: "There are currently no running events scheduled in France.",
+        stayInformed: {
+          title: "Stay informed!",
+          message: "We regularly add new events. Come back soon!",
+          button: "Back to home",
+        },
+      },
+    },
+    cta: {
+      title: "Ready to run in France?",
+      description:
+        "Join thousands of runners who participate in the best French races.",
+      button: "Explore regions",
+    },
+  },
 };
 
-export default async function FrancePage() {
+export async function generateMetadata({
+  params,
+}: {
+  params: { lang: "fr" | "en" };
+}) {
+  const t = translations[params.lang];
+  return {
+    title: t.metadata.title,
+    description: t.metadata.description,
+  };
+}
+
+export default async function FrancePage({
+  params,
+}: {
+  params: { lang: "fr" | "en" };
+}) {
+  const t = translations[params.lang];
+
   // Fetch regions with explicit typing
   const { data: regions, error: regionsError }: SupabaseResponse<Region> =
     await supabase.from("regions").select("*").eq("country_slug", "france");
@@ -21,11 +167,9 @@ export default async function FrancePage() {
         <div className="text-center p-8">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h2 className="text-2xl font-bold text-red-800 mb-2">
-            Erreur de connexion
+            {t.error.title}
           </h2>
-          <p className="text-red-600">
-            Impossible de charger les régions. Veuillez réessayer plus tard.
-          </p>
+          <p className="text-red-600">{t.error.regionsMessage}</p>
         </div>
       </div>
     );
@@ -41,11 +185,9 @@ export default async function FrancePage() {
         <div className="text-center p-8">
           <div className="text-yellow-500 text-6xl mb-4">🏃‍♂️</div>
           <h2 className="text-2xl font-bold text-yellow-800 mb-2">
-            Aucune région trouvée
+            {t.noData.regions.title}
           </h2>
-          <p className="text-yellow-600">
-            Aucune région n'est disponible pour la France pour le moment.
-          </p>
+          <p className="text-yellow-600">{t.noData.regions.message}</p>
         </div>
       </div>
     );
@@ -62,11 +204,9 @@ export default async function FrancePage() {
         <div className="text-center p-8">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h2 className="text-2xl font-bold text-red-800 mb-2">
-            Erreur de connexion
+            {t.error.title}
           </h2>
-          <p className="text-red-600">
-            Impossible de charger les villes. Veuillez réessayer plus tard.
-          </p>
+          <p className="text-red-600">{t.error.citiesMessage}</p>
         </div>
       </div>
     );
@@ -80,11 +220,9 @@ export default async function FrancePage() {
         <div className="text-center p-8">
           <div className="text-yellow-500 text-6xl mb-4">🏃‍♂️</div>
           <h2 className="text-2xl font-bold text-yellow-800 mb-2">
-            Aucune ville trouvée
+            {t.noData.cities.title}
           </h2>
-          <p className="text-yellow-600">
-            Aucune ville n'est disponible pour les régions de France.
-          </p>
+          <p className="text-yellow-600">{t.noData.cities.message}</p>
         </div>
       </div>
     );
@@ -101,11 +239,9 @@ export default async function FrancePage() {
         <div className="text-center p-8">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h2 className="text-2xl font-bold text-red-800 mb-2">
-            Erreur de connexion
+            {t.error.title}
           </h2>
-          <p className="text-red-600">
-            Impossible de charger les événements. Veuillez réessayer plus tard.
-          </p>
+          <p className="text-red-600">{t.error.eventsMessage}</p>
         </div>
       </div>
     );
@@ -117,15 +253,15 @@ export default async function FrancePage() {
       <main className="py-16 px-6 bg-gray-50">
         <section className="max-w-4xl mx-auto text-center mb-16">
           <h2 className="text-3xl font-bold text-blue-800 mb-10">
-            Choisissez une région
+            {t.regions.title}
           </h2>
-          <RegionList regions={regions || []} lang="fr" />
+          <RegionList regions={regions || []} lang={params.lang} />
         </section>
         <section className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-blue-800 mb-10">
-            Courses à pied en France
+            {t.events.title}
           </h2>
-          <p>Aucun événement trouvé pour la France.</p>
+          <p>{t.events.noEvents.message}</p>
         </section>
       </main>
     );
@@ -143,19 +279,17 @@ export default async function FrancePage() {
         <div className="relative max-w-6xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-black mb-6 tracking-tight leading-tight">
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-100">
-              Courses à pied
+              {t.hero.title.running}
             </span>
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-300 to-red-200">
-              en France
+              {t.hero.title.inFrance}
             </span>
           </h1>
 
           <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-8 text-blue-100 leading-relaxed">
-            Découvrez les meilleures courses à pied organisées dans toutes les
-            régions de France.
+            {t.hero.subtitle}
             <span className="block mt-2 text-lg text-blue-200">
-              Du nord au sud, de l'est à l'ouest, trouvez votre prochaine
-              course.
+              {t.hero.subtitle2}
             </span>
           </p>
 
@@ -163,19 +297,19 @@ export default async function FrancePage() {
             <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
               <span className="text-2xl">🏃‍♂️</span>
               <span className="font-semibold">
-                {events?.length || 0} événements
+                {events?.length || 0} {t.hero.stats.events}
               </span>
             </div>
             <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
               <span className="text-2xl">🏙️</span>
               <span className="font-semibold">
-                {cities?.length || 0} villes
+                {cities?.length || 0} {t.hero.stats.cities}
               </span>
             </div>
             <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
               <span className="text-2xl">🗺️</span>
               <span className="font-semibold">
-                {regions?.length || 0} régions
+                {regions?.length || 0} {t.hero.stats.regions}
               </span>
             </div>
           </div>
@@ -187,14 +321,13 @@ export default async function FrancePage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Explorez par région
+              {t.regions.title}
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Choisissez une région française et découvrez toutes les courses à
-              pied disponibles.
+              {t.regions.description}
             </p>
           </div>
-          <RegionList regions={regions || []} lang="fr" />
+          <RegionList regions={regions || []} lang={params.lang} />
         </div>
       </section>
 
@@ -204,11 +337,10 @@ export default async function FrancePage() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                Toutes les courses en France
+                {t.events.title}
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Découvrez notre sélection des meilleures courses à pied
-                organisées dans toute la France.
+                {t.events.description}
               </p>
             </div>
 
@@ -223,7 +355,7 @@ export default async function FrancePage() {
                     event={evt}
                     regionSlug={city?.region_slug || ""}
                     city={{ slug: evt.city_slug || "" }}
-                    lang="fr"
+                    lang={params.lang}
                   />
                 );
               })}
@@ -237,25 +369,23 @@ export default async function FrancePage() {
               <span className="text-6xl mb-4 block">🏃‍♂️</span>
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-6">
-              Aucun événement trouvé
+              {t.events.noEvents.title}
             </h2>
             <p className="text-xl text-gray-600 mb-8">
-              Il n'y a actuellement aucun événement de course à pied programmé
-              en France.
+              {t.events.noEvents.message}
             </p>
             <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                Restez informé !
+                {t.events.noEvents.stayInformed.title}
               </h3>
               <p className="text-gray-600 mb-6">
-                Nous ajoutons régulièrement de nouveaux événements. Revenez
-                bientôt !
+                {t.events.noEvents.stayInformed.message}
               </p>
               <a
-                href="/fr"
+                href={`/${params.lang}`}
                 className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-300"
               >
-                <span>Retour à l'accueil</span>
+                <span>{t.events.noEvents.stayInformed.button}</span>
                 <svg
                   className="w-4 h-4 ml-2"
                   fill="none"
@@ -278,19 +408,16 @@ export default async function FrancePage() {
       {/* CTA Section */}
       <section className="py-20 px-6 bg-gradient-to-r from-blue-600 to-indigo-700">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">
-            Prêt à courir en France ?
-          </h2>
+          <h2 className="text-4xl font-bold text-white mb-6">{t.cta.title}</h2>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Rejoignez des milliers de coureurs qui participent aux meilleures
-            courses françaises.
+            {t.cta.description}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="#regions"
               className="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 font-bold rounded-full hover:bg-gray-100 transition-colors duration-300 shadow-lg hover:shadow-xl"
             >
-              <span>Explorer les régions</span>
+              <span>{t.cta.button}</span>
               <svg
                 className="w-5 h-5 ml-2"
                 fill="none"

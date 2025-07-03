@@ -1,12 +1,157 @@
 import { supabase } from "@/lib/supabase";
+import { Metadata } from "next";
 import { Event, SupabaseSingleResponse } from "@/types/types";
 
+// Translations object
+const translations = {
+  fr: {
+    metadata: {
+      title: "Détail de la course",
+      description: "Informations sur la course {title}.",
+    },
+    error: {
+      title: "Événement introuvable",
+      message:
+        "L'événement que vous recherchez n'existe pas ou a été supprimé.",
+    },
+    hero: {
+      subtitle:
+        "Préparez-vous pour une course exceptionnelle dans un cadre magnifique.",
+      stats: {
+        location: "📍",
+        distance: "📏",
+        price: "💶",
+      },
+    },
+    details: {
+      title: "Détails de la course",
+      subtitle: "Toutes les informations importantes pour votre participation",
+      sections: {
+        dateTime: {
+          title: "Date et heure",
+          icon: "📅",
+        },
+        location: {
+          title: "Localisation",
+          icon: "📍",
+        },
+        distance: {
+          title: "Distance",
+          icon: "📏",
+          unit: "kilomètres",
+        },
+        price: {
+          title: "Prix d'inscription",
+          icon: "💶",
+        },
+        registration: {
+          title: "Inscriptions ouvertes",
+          icon: "✅",
+          message:
+            "Les inscriptions sont actuellement ouvertes pour cette course.",
+          button: "S'inscrire maintenant",
+        },
+        important: {
+          title: "Informations importantes",
+          icon: "ℹ️",
+          items: [
+            "Arrivez 30 minutes avant le départ",
+            "Apportez votre équipement de course",
+            "Consultez la météo avant de partir",
+          ],
+        },
+      },
+    },
+    cta: {
+      title: "Prêt à relever le défi ?",
+      description:
+        "Rejoignez des centaines de coureurs pour cette course exceptionnelle à {city}.",
+      buttons: {
+        register: "S'inscrire à la course",
+        otherEvents: "Voir d'autres courses",
+      },
+    },
+  },
+  en: {
+    metadata: {
+      title: "Race details",
+      description: "Information about the race {title}.",
+    },
+    error: {
+      title: "Event not found",
+      message:
+        "The event you are looking for does not exist or has been removed.",
+    },
+    hero: {
+      subtitle: "Get ready for an exceptional race in a beautiful setting.",
+      stats: {
+        location: "📍",
+        distance: "📏",
+        price: "💶",
+      },
+    },
+    details: {
+      title: "Race details",
+      subtitle: "All important information for your participation",
+      sections: {
+        dateTime: {
+          title: "Date and time",
+          icon: "📅",
+        },
+        location: {
+          title: "Location",
+          icon: "📍",
+        },
+        distance: {
+          title: "Distance",
+          icon: "📏",
+          unit: "kilometers",
+        },
+        price: {
+          title: "Registration fee",
+          icon: "💶",
+        },
+        registration: {
+          title: "Registration open",
+          icon: "✅",
+          message: "Registration is currently open for this race.",
+          button: "Register now",
+        },
+        important: {
+          title: "Important information",
+          icon: "ℹ️",
+          items: [
+            "Arrive 30 minutes before the start",
+            "Bring your running equipment",
+            "Check the weather before leaving",
+          ],
+        },
+      },
+    },
+    cta: {
+      title: "Ready to take on the challenge?",
+      description:
+        "Join hundreds of runners for this exceptional race in {city}.",
+      buttons: {
+        register: "Register for the race",
+        otherEvents: "See other races",
+      },
+    },
+  },
+};
+
 interface Props {
-  params: Promise<{ region: string; city: string; event: string }>;
+  params: Promise<{
+    region: string;
+    city: string;
+    event: string;
+    lang: "fr" | "en";
+  }>;
 }
 
 export const generateMetadata = async ({ params }: Props) => {
-  const { event } = await params;
+  const { event, lang } = await params;
+  const t = translations[lang];
 
   const { data: eventData }: SupabaseSingleResponse<Event> = await supabase
     .from("events")
@@ -15,13 +160,17 @@ export const generateMetadata = async ({ params }: Props) => {
     .single();
 
   return {
-    title: eventData?.title || "Détail de la course",
-    description: `Informations sur la course ${eventData?.title || "à venir"}.`,
+    title: eventData?.title || t.metadata.title,
+    description: t.metadata.description.replace(
+      "{title}",
+      eventData?.title || ""
+    ),
   };
 };
 
 export default async function EventDetails({ params }: Props) {
-  const { event } = await params;
+  const { event, lang } = await params;
+  const t = translations[lang];
 
   const { data: eventData, error }: SupabaseSingleResponse<Event> =
     await supabase.from("events").select("*").eq("slug", event).single();
@@ -33,11 +182,9 @@ export default async function EventDetails({ params }: Props) {
         <div className="text-center p-8">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h2 className="text-2xl font-bold text-red-800 mb-2">
-            Événement introuvable
+            {t.error.title}
           </h2>
-          <p className="text-red-600">
-            L'événement que vous recherchez n'existe pas ou a été supprimé.
-          </p>
+          <p className="text-red-600">{t.error.message}</p>
         </div>
       </div>
     );
@@ -65,22 +212,21 @@ export default async function EventDetails({ params }: Props) {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
             <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
-              <span className="text-2xl">📍</span>
+              <span className="text-2xl">{t.hero.stats.location}</span>
               <span className="font-semibold">{eventData.city_slug}</span>
             </div>
             <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
-              <span className="text-2xl">📏</span>
+              <span className="text-2xl">{t.hero.stats.distance}</span>
               <span className="font-semibold">{eventData.distance_km} km</span>
             </div>
             <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
-              <span className="text-2xl">💶</span>
+              <span className="text-2xl">{t.hero.stats.price}</span>
               <span className="font-semibold">{eventData.price}</span>
             </div>
           </div>
 
           <p className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-            Préparez-vous pour une course exceptionnelle dans un cadre
-            magnifique.
+            {t.hero.subtitle}
           </p>
         </div>
       </section>
@@ -91,10 +237,8 @@ export default async function EventDetails({ params }: Props) {
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-8 text-white">
-              <h2 className="text-3xl font-bold mb-4">Détails de la course</h2>
-              <p className="text-blue-100">
-                Toutes les informations importantes pour votre participation
-              </p>
+              <h2 className="text-3xl font-bold mb-4">{t.details.title}</h2>
+              <p className="text-blue-100">{t.details.subtitle}</p>
             </div>
 
             {/* Content */}
@@ -104,8 +248,10 @@ export default async function EventDetails({ params }: Props) {
                 <div className="space-y-6">
                   <div className="bg-gray-50 rounded-xl p-6">
                     <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                      <span className="text-2xl mr-3">📅</span>
-                      Date et heure
+                      <span className="text-2xl mr-3">
+                        {t.details.sections.dateTime.icon}
+                      </span>
+                      {t.details.sections.dateTime.title}
                     </h3>
                     <p className="text-gray-700 text-lg font-medium">
                       {eventData.date}
@@ -114,8 +260,10 @@ export default async function EventDetails({ params }: Props) {
 
                   <div className="bg-gray-50 rounded-xl p-6">
                     <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                      <span className="text-2xl mr-3">📍</span>
-                      Localisation
+                      <span className="text-2xl mr-3">
+                        {t.details.sections.location.icon}
+                      </span>
+                      {t.details.sections.location.title}
                     </h3>
                     <p className="text-gray-700 text-lg font-medium">
                       {eventData.city_slug}
@@ -124,11 +272,13 @@ export default async function EventDetails({ params }: Props) {
 
                   <div className="bg-gray-50 rounded-xl p-6">
                     <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                      <span className="text-2xl mr-3">📏</span>
-                      Distance
+                      <span className="text-2xl mr-3">
+                        {t.details.sections.distance.icon}
+                      </span>
+                      {t.details.sections.distance.title}
                     </h3>
                     <p className="text-gray-700 text-lg font-medium">
-                      {eventData.distance_km} kilomètres
+                      {eventData.distance_km} {t.details.sections.distance.unit}
                     </p>
                   </div>
                 </div>
@@ -137,8 +287,10 @@ export default async function EventDetails({ params }: Props) {
                 <div className="space-y-6">
                   <div className="bg-gray-50 rounded-xl p-6">
                     <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                      <span className="text-2xl mr-3">💶</span>
-                      Prix d'inscription
+                      <span className="text-2xl mr-3">
+                        {t.details.sections.price.icon}
+                      </span>
+                      {t.details.sections.price.title}
                     </h3>
                     <p className="text-gray-700 text-lg font-medium">
                       {eventData.price}
@@ -147,12 +299,13 @@ export default async function EventDetails({ params }: Props) {
 
                   <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
                     <h3 className="text-xl font-semibold text-green-900 mb-4 flex items-center">
-                      <span className="text-2xl mr-3">✅</span>
-                      Inscriptions ouvertes
+                      <span className="text-2xl mr-3">
+                        {t.details.sections.registration.icon}
+                      </span>
+                      {t.details.sections.registration.title}
                     </h3>
                     <p className="text-green-700 mb-4">
-                      Les inscriptions sont actuellement ouvertes pour cette
-                      course.
+                      {t.details.sections.registration.message}
                     </p>
                     <a
                       href={eventData.registration_url}
@@ -160,7 +313,7 @@ export default async function EventDetails({ params }: Props) {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <span>S'inscrire maintenant</span>
+                      <span>{t.details.sections.registration.button}</span>
                       <svg
                         className="w-5 h-5 ml-2"
                         fill="none"
@@ -179,22 +332,18 @@ export default async function EventDetails({ params }: Props) {
 
                   <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
                     <h3 className="text-xl font-semibold text-blue-900 mb-4 flex items-center">
-                      <span className="text-2xl mr-3">ℹ️</span>
-                      Informations importantes
+                      <span className="text-2xl mr-3">
+                        {t.details.sections.important.icon}
+                      </span>
+                      {t.details.sections.important.title}
                     </h3>
                     <ul className="text-blue-700 space-y-2">
-                      <li className="flex items-start">
-                        <span className="text-blue-500 mr-2">•</span>
-                        Arrivez 30 minutes avant le départ
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-blue-500 mr-2">•</span>
-                        Apportez votre équipement de course
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-blue-500 mr-2">•</span>
-                        Consultez la météo avant de partir
-                      </li>
+                      {t.details.sections.important.items.map((item, index) => (
+                        <li key={index} className="flex items-start">
+                          <span className="text-blue-500 mr-2">•</span>
+                          {item}
+                        </li>
+                      ))}
                     </ul>
                   </div>
                 </div>
@@ -207,12 +356,9 @@ export default async function EventDetails({ params }: Props) {
       {/* CTA Section */}
       <section className="py-20 px-6 bg-gradient-to-r from-blue-600 to-indigo-700">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">
-            Prêt à relever le défi ?
-          </h2>
+          <h2 className="text-4xl font-bold text-white mb-6">{t.cta.title}</h2>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Rejoignez des centaines de coureurs pour cette course exceptionnelle
-            à {eventData.city_slug}.
+            {t.cta.description.replace("{city}", eventData.city_slug || "")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
@@ -221,7 +367,7 @@ export default async function EventDetails({ params }: Props) {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <span>S'inscrire à la course</span>
+              <span>{t.cta.buttons.register}</span>
               <svg
                 className="w-5 h-5 ml-2"
                 fill="none"
@@ -237,10 +383,10 @@ export default async function EventDetails({ params }: Props) {
               </svg>
             </a>
             <a
-              href={`/fr/france/${eventData.city_slug}`}
+              href={`/${lang}/france/${eventData.city_slug || ""}`}
               className="inline-flex items-center justify-center px-8 py-4 bg-transparent text-white font-bold rounded-full border-2 border-white hover:bg-white hover:text-blue-600 transition-colors duration-300"
             >
-              <span>Voir d'autres courses</span>
+              <span>{t.cta.buttons.otherEvents}</span>
               <svg
                 className="w-5 h-5 ml-2"
                 fill="none"
