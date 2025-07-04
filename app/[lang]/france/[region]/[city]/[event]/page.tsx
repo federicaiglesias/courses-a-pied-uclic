@@ -280,9 +280,11 @@ export default async function EventDetails({ params }: Props) {
 
             {/* Content */}
             <div className="p-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Left Column - Event Info */}
+              {/* Primera fila: Fecha/Lugar | Precio/Distancia */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                {/* Col izquierda: Fecha y Lugar */}
                 <div className="space-y-6">
+                  {/* Fecha */}
                   <div className="bg-gray-50 rounded-xl p-6">
                     <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
                       <span className="text-2xl mr-3">
@@ -294,7 +296,7 @@ export default async function EventDetails({ params }: Props) {
                       {eventData.date}
                     </p>
                   </div>
-
+                  {/* Lugar */}
                   <div className="bg-gray-50 rounded-xl p-6">
                     <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
                       <span className="text-2xl mr-3">
@@ -306,7 +308,22 @@ export default async function EventDetails({ params }: Props) {
                       {eventData.city_slug}
                     </p>
                   </div>
-
+                </div>
+                {/* Col derecha: Precio y Distancia */}
+                <div className="space-y-6 mt-6 md:mt-0">
+                  {/* Precio */}
+                  <div className="bg-gray-50 rounded-xl p-6">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                      <span className="text-2xl mr-3">
+                        {t.details.sections.price.icon}
+                      </span>
+                      {t.details.sections.price.title}
+                    </h3>
+                    <p className="text-gray-700 text-lg font-medium">
+                      {eventData.price}
+                    </p>
+                  </div>
+                  {/* Distancia */}
                   <div className="bg-gray-50 rounded-xl p-6">
                     <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
                       <span className="text-2xl mr-3">
@@ -319,22 +336,29 @@ export default async function EventDetails({ params }: Props) {
                     </p>
                   </div>
                 </div>
-
-                {/* Right Column - Registration Info */}
-                <div className="space-y-6">
-                  <div className="bg-gray-50 rounded-xl p-6">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                      <span className="text-2xl mr-3">
-                        {t.details.sections.price.icon}
-                      </span>
-                      {t.details.sections.price.title}
-                    </h3>
-                    <p className="text-gray-700 text-lg font-medium">
-                      {eventData.price}
-                    </p>
-                  </div>
-
-                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+              </div>
+              {/* Segunda fila: Información importante | Registro */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Col izquierda: Información importante */}
+                <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
+                  <h3 className="text-xl font-semibold text-blue-900 mb-4 flex items-center">
+                    <span className="text-2xl mr-3">
+                      {t.details.sections.important.icon}
+                    </span>
+                    {t.details.sections.important.title}
+                  </h3>
+                  <ul className="text-blue-700 space-y-2">
+                    {t.details.sections.important.items.map((item, index) => (
+                      <li key={index} className="flex items-start">
+                        <span className="text-blue-500 mr-2">•</span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                {/* Col derecha: Registro */}
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200 flex flex-col justify-between">
+                  <div>
                     <h3 className="text-xl font-semibold text-green-900 mb-4 flex items-center">
                       <span className="text-2xl mr-3">
                         {t.details.sections.registration.icon}
@@ -344,45 +368,28 @@ export default async function EventDetails({ params }: Props) {
                     <p className="text-green-700 mb-4">
                       {t.details.sections.registration.message}
                     </p>
-                    <a
-                      href={eventData.registration_url}
-                      className="inline-flex items-center justify-center w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-colors duration-300 shadow-lg hover:shadow-xl"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                  </div>
+                  <a
+                    href={eventData.registration_url}
+                    className="inline-flex items-center justify-center w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-colors duration-300 shadow-lg hover:shadow-xl mt-4"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <span>{t.details.sections.registration.button}</span>
+                    <svg
+                      className="w-5 h-5 ml-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
-                      <span>{t.details.sections.registration.button}</span>
-                      <svg
-                        className="w-5 h-5 ml-2"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                        />
-                      </svg>
-                    </a>
-                  </div>
-
-                  <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
-                    <h3 className="text-xl font-semibold text-blue-900 mb-4 flex items-center">
-                      <span className="text-2xl mr-3">
-                        {t.details.sections.important.icon}
-                      </span>
-                      {t.details.sections.important.title}
-                    </h3>
-                    <ul className="text-blue-700 space-y-2">
-                      {t.details.sections.important.items.map((item, index) => (
-                        <li key={index} className="flex items-start">
-                          <span className="text-blue-500 mr-2">•</span>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
+                    </svg>
+                  </a>
                 </div>
               </div>
             </div>

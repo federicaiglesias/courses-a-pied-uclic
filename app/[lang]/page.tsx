@@ -162,14 +162,14 @@ export default async function Home({
             </span>
           </div>
 
-          <h1 className="text-6xl md:text-7xl font-black mb-6 tracking-tight leading-tight">
-            <span className=" text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-300">
+          <h1 className="text-6xl md:text-7xl font-black mb-6 tracking-tight leading-tight flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-300">
               {t.hero.title.run}
             </span>
-            <span className=" text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-300">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-300">
               {t.hero.title.breathe}
             </span>
-            <span className=" text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
               {t.hero.title.win}
             </span>
           </h1>
