@@ -182,6 +182,7 @@ export default async function FrancePage({ params }: PageProps) {
       </div>
     );
   }
+  
 
   const regionSlugs: string[] =
     regions?.map((region: Region) => region.slug) || [];
@@ -198,7 +199,7 @@ export default async function FrancePage({ params }: PageProps) {
       </div>
     );
   }
-
+  console.log("regionSlugs →", regionSlugs);
   const { data: cities, error: citiesError }: SupabaseResponse<City> =
     await supabase.from("cities").select("*").in("region_slug", regionSlugs);
 

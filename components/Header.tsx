@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { getNavigationLinks } from "@/lib/fetchNavigation";
 import LanguageSwitcher from "./LanguageSwitcher";
 import MobileMenu from "./MobileMenu";
@@ -9,6 +10,7 @@ interface HeaderProps {
 
 export default async function Header({ lang }: HeaderProps) {
   const links = await getNavigationLinks(lang, "header");
+  const headersList = await headers();
 
   const navigation = {
     fr: {
@@ -26,6 +28,7 @@ export default async function Header({ lang }: HeaderProps) {
   };
 
   const t = navigation[lang];
+  const pathname = headersList.get("x-next-pathname") || "/";
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white shadow-xs">
@@ -69,7 +72,7 @@ export default async function Header({ lang }: HeaderProps) {
 
           {/* Desktop Language Switcher */}
           <div className="hidden md:block">
-            <LanguageSwitcher lang={lang} />
+            <LanguageSwitcher lang={lang} pathname={pathname} />
           </div>
 
           {/* Mobile Menu */}

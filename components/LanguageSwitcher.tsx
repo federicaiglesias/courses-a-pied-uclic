@@ -1,15 +1,14 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 interface LanguageSwitcherProps {
   lang: "fr" | "en";
+  pathname: string;
 }
 
-export default function LanguageSwitcher({ lang }: LanguageSwitcherProps) {
-  const pathname = usePathname();
-
+export default function LanguageSwitcher({
+  lang,
+  pathname,
+}: LanguageSwitcherProps) {
   return (
     <div className="flex items-center space-x-2">
       <Link
