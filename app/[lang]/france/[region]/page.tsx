@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import CityList from "@/components/CityList";
 import EventCard from "@/components/EventCard";
+import Pagination from "@/components/Pagination";
 import { City, Event, SupabaseResponse } from "@/types/types";
 
 // Translations object
@@ -114,6 +115,9 @@ const translations = {
 
 interface Props {
   params: Promise<{ region: string; lang: "fr" | "en" }>;
+  searchParams: Promise<{
+    page?: string;
+  }>;
 }
 
 export async function generateMetadata({
@@ -129,8 +133,11 @@ export async function generateMetadata({
   };
 }
 
-export default async function RegionPage({ params }: Props) {
+export default async function RegionPage({ params, searchParams }: Props) {
   const { region, lang } = await params;
+  const { page } = await searchParams;
+  const currentPage = page ? parseInt(page) : 1;
+  const itemsPerPage = 20;
   const t = translations[lang];
 
   // Verificar si la región existe
@@ -166,8 +173,22 @@ export default async function RegionPage({ params }: Props) {
     );
   }
 
+  // Get total count for pagination
+  const { count: totalCities } = await supabase
+    .from("cities")
+    .select("*", { count: "exact", head: true })
+    .eq("region_slug", region);
+
+  const totalPages = Math.ceil((totalCities || 0) / itemsPerPage);
+  const offset = (currentPage - 1) * itemsPerPage;
+
   const { data: cities, error: citiesError }: SupabaseResponse<City> =
-    await supabase.from("cities").select("*").eq("region_slug", region);
+    await supabase
+      .from("cities")
+      .select("*")
+      .eq("region_slug", region)
+      .range(offset, offset + itemsPerPage - 1)
+      .order("name", { ascending: true });
 
   if (citiesError) {
     console.error("Erreur Supabase (cities):", citiesError.message);
@@ -269,6 +290,16 @@ export default async function RegionPage({ params }: Props) {
             </p>
           </div>
           <CityList cities={cities || []} lang={lang} />
+
+          {/* Pagination for cities */}
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              baseUrl={`/${lang}/france/${region}`}
+              lang={lang}
+            />
+          )}
         </div>
       </section>
 

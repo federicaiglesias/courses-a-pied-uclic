@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import LanguageSwitcher from "./LanguageSwitcher";
+import MobileRegionMenu from "./MobileRegionMenu";
+import { Region, City } from "@/types/types";
 
 interface MobileMenuProps {
   lang: "fr" | "en";
@@ -10,11 +12,15 @@ interface MobileMenuProps {
     contact: string;
     legal: string;
   };
+  regions: Region[];
+  cities: City[];
 }
 
 export default async function MobileMenu({
   lang,
   navigation,
+  regions,
+  cities,
 }: MobileMenuProps) {
   const headersList = await headers();
   const pathname = headersList.get("x-next-pathname") || "/";
@@ -54,12 +60,7 @@ export default async function MobileMenu({
           >
             {navigation.home}
           </Link>
-          <Link
-            href={`/${lang}/france`}
-            className="block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 text-blue-100 hover:text-white hover:bg-white/10"
-          >
-            {navigation.france}
-          </Link>
+          <MobileRegionMenu regions={regions} cities={cities} lang={lang} />
           <Link
             href={`/${lang}/contact`}
             className="block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 text-blue-100 hover:text-white hover:bg-white/10"

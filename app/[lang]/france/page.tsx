@@ -1,11 +1,15 @@
 import { supabase } from "@/lib/supabase";
 import RegionList from "@/components/RegionList";
 import EventCard from "@/components/EventCard";
+import Pagination from "@/components/Pagination";
 import { Region, City, Event, SupabaseResponse } from "@/types/types";
 
 type PageProps = {
   params: Promise<{
     lang: "fr" | "en";
+  }>;
+  searchParams: Promise<{
+    page?: string;
   }>;
 };
 
@@ -158,11 +162,14 @@ export async function generateMetadata({ params }: PageProps) {
   };
 }
 
-export default async function FrancePage({ params }: PageProps) {
+export default async function FrancePage({ params, searchParams }: PageProps) {
   if (!params) {
     return null;
   }
   const { lang } = await params;
+  const { page } = await searchParams;
+  const currentPage = page ? parseInt(page) : 1;
+  const itemsPerPage = 20;
   const t = translations[lang];
 
   const { data: regions, error: regionsError }: SupabaseResponse<Region> =
@@ -182,7 +189,6 @@ export default async function FrancePage({ params }: PageProps) {
       </div>
     );
   }
-  
 
   const regionSlugs: string[] =
     regions?.map((region: Region) => region.slug) || [];
@@ -233,8 +239,22 @@ export default async function FrancePage({ params }: PageProps) {
       </div>
     );
   }
+  // Get total count for pagination
+  const { count: totalEvents } = await supabase
+    .from("events")
+    .select("*", { count: "exact", head: true })
+    .in("city_slug", citySlugs);
+
+  const totalPages = Math.ceil((totalEvents || 0) / itemsPerPage);
+  const offset = (currentPage - 1) * itemsPerPage;
+
   const { data: events, error: eventsError }: SupabaseResponse<Event> =
-    await supabase.from("events").select("*").in("city_slug", citySlugs);
+    await supabase
+      .from("events")
+      .select("*")
+      .in("city_slug", citySlugs)
+      .range(offset, offset + itemsPerPage - 1)
+      .order("date", { ascending: true });
 
   if (eventsError) {
     console.error("Erreur Supabase (events):", eventsError.message);
@@ -344,6 +364,16 @@ export default async function FrancePage({ params }: PageProps) {
                 );
               })}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                baseUrl={`/${lang}/france`}
+                lang={lang}
+              />
+            )}
           </div>
         </section>
       ) : (

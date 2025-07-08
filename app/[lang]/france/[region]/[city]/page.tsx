@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import EventCard from "@/components/EventCard";
+import Pagination from "@/components/Pagination";
 import { Event, SupabaseResponse } from "@/types/types";
 
 // Translations object
@@ -97,6 +98,9 @@ const translations = {
 
 interface Props {
   params: Promise<{ region: string; city: string; lang: "fr" | "en" }>;
+  searchParams: Promise<{
+    page?: string;
+  }>;
 }
 
 export async function generateMetadata({
@@ -112,8 +116,11 @@ export async function generateMetadata({
   };
 }
 
-export default async function CityPage({ params }: Props) {
+export default async function CityPage({ params, searchParams }: Props) {
   const { region, city, lang } = await params;
+  const { page } = await searchParams;
+  const currentPage = page ? parseInt(page) : 1;
+  const itemsPerPage = 20;
   const t = translations[lang];
 
   // Verificar si la ciudad existe y pertenece a la región
@@ -149,10 +156,21 @@ export default async function CityPage({ params }: Props) {
     );
   }
 
+  // Get total count for pagination
+  const { count: totalEvents } = await supabase
+    .from("events")
+    .select("*", { count: "exact", head: true })
+    .eq("city_slug", city);
+
+  const totalPages = Math.ceil((totalEvents || 0) / itemsPerPage);
+  const offset = (currentPage - 1) * itemsPerPage;
+
   const { data, error } = await supabase
     .from("events")
     .select("*, event_i18n(*)")
-    .eq("city_slug", city);
+    .eq("city_slug", city)
+    .range(offset, offset + itemsPerPage - 1)
+    .order("date", { ascending: true });
 
   const events = (data || []).map((event: any) => {
     const i18n = event.event_i18n?.find((i: any) => i.lang === lang);
@@ -255,6 +273,16 @@ export default async function CityPage({ params }: Props) {
                 />
               ))}
             </div>
+
+            {/* Pagination for events */}
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                baseUrl={`/${lang}/france/${region}/${city}`}
+                lang={lang}
+              />
+            )}
           </div>
         </section>
       ) : (
