@@ -5,6 +5,7 @@ interface EventJsonLdProps {
   lang: "fr" | "en";
   region: string;
   city: string;
+  description: string;
 }
 
 export default function EventJsonLd({
@@ -12,6 +13,7 @@ export default function EventJsonLd({
   lang,
   region,
   city,
+  description,
 }: EventJsonLdProps) {
   const baseUrl =
     process.env.NEXT_PUBLIC_SITE_URL || "https://courses-a-pied.com";
@@ -32,7 +34,7 @@ export default function EventJsonLd({
         addressCountry: "FR",
       },
     },
-    description: event.description || `${event.title} - Course à pied`,
+    description: description || `${event.title} - Course à pied`,
     url: eventUrl,
     eventStatus: "https://schema.org/EventScheduled",
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
@@ -50,7 +52,7 @@ export default function EventJsonLd({
   };
 
   if (event.image_url) {
-    jsonLd.image = event.image_url;
+    (jsonLd as any).image = event.image_url;
   }
 
   if (event.distance_km) {

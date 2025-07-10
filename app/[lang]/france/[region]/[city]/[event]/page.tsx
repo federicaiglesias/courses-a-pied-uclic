@@ -280,7 +280,17 @@ export default async function EventDetails({ params }: Props) {
 
   return (
     <>
-      <EventJsonLd event={eventData} lang={lang} region={region} city={city} />
+      <EventJsonLd
+        event={eventData}
+        lang={lang}
+        region={region}
+        city={city}
+        description={
+          lang === "fr"
+            ? `Informations sur la course ${eventData.title} à ${city}.`
+            : `Information about the race ${eventData.title} in ${city}.`
+        }
+      />
       <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         {/* Hero Section */}
         <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-20 px-6">
