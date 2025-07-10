@@ -3,6 +3,8 @@ import CityList from "@/components/CityList";
 import EventCard from "@/components/EventCard";
 import Pagination from "@/components/Pagination";
 import { City, Event, SupabaseResponse } from "@/types/types";
+import { getSeoMetadata } from "@/lib/getSeoMetadata";
+import { Metadata } from "next";
 
 // Translations object
 const translations = {
@@ -124,12 +126,39 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<{ region: string; lang: "fr" | "en" }>;
-}) {
+}): Promise<Metadata> {
   const { region, lang } = await params;
-  const t = translations[lang];
+
+  const metadata = await getSeoMetadata({
+    slug: `france-${region}`,
+    lang,
+    fallback: {
+      title:
+        lang === "fr"
+          ? `Courses à pied en ${region}`
+          : `Running events in ${region}`,
+      description:
+        lang === "fr"
+          ? `Trouvez toutes les courses à pied organisées en ${region}`
+          : `Find all running events organized in ${region}`,
+    },
+  });
+
   return {
-    title: t.metadata.title.replace("{region}", region),
-    description: t.metadata.description.replace("{region}", region),
+    title: metadata.title,
+    description: metadata.description,
+    openGraph: {
+      title: metadata.title,
+      description: metadata.description,
+      type: "website",
+      locale: lang,
+      alternateLocale: lang === "fr" ? "en" : "fr",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: metadata.title,
+      description: metadata.description,
+    },
   };
 }
 

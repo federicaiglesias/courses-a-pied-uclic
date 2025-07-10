@@ -3,6 +3,8 @@ import RegionList from "@/components/RegionList";
 import EventCard from "@/components/EventCard";
 import Pagination from "@/components/Pagination";
 import { Region, City, Event, SupabaseResponse } from "@/types/types";
+import { getSeoMetadata } from "@/lib/getSeoMetadata";
+import { Metadata } from "next";
 
 type PageProps = {
   params: Promise<{
@@ -146,19 +148,39 @@ const translations = {
   },
 };
 
-export async function generateMetadata({ params }: PageProps) {
-  if (!params) {
-    return {
-      title: "Courses à pied en France",
-      description:
-        "Trouvez toutes les courses à pied organisées en France par région.",
-    };
-  }
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { lang } = await params;
-  const t = translations[lang];
+
+  const metadata = await getSeoMetadata({
+    slug: "france",
+    lang,
+    fallback: {
+      title:
+        lang === "fr" ? "Courses à pied en France" : "Running events in France",
+      description:
+        lang === "fr"
+          ? "Trouvez toutes les courses à pied organisées en France par région."
+          : "Find all running events organized in France by region.",
+    },
+  });
+
   return {
-    title: t.metadata.title,
-    description: t.metadata.description,
+    title: metadata.title,
+    description: metadata.description,
+    openGraph: {
+      title: metadata.title,
+      description: metadata.description,
+      type: "website",
+      locale: lang,
+      alternateLocale: lang === "fr" ? "en" : "fr",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: metadata.title,
+      description: metadata.description,
+    },
   };
 }
 

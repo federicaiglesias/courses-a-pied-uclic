@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import { Metadata } from "next";
 import { Event, SupabaseSingleResponse } from "@/types/types";
+import { getSeoMetadata } from "@/lib/getSeoMetadata";
 
 // Translations object
 const translations = {
@@ -149,22 +150,47 @@ interface Props {
   }>;
 }
 
-export const generateMetadata = async ({ params }: Props) => {
-  const { event, lang } = await params;
-  const t = translations[lang];
+export const generateMetadata = async ({
+  params,
+}: Props): Promise<Metadata> => {
+  const { region, city, event, lang } = await params;
 
+  // Get event data for dynamic metadata
   const { data: eventData }: SupabaseSingleResponse<Event> = await supabase
     .from("events")
     .select("*")
     .eq("slug", event)
     .single();
 
+  const metadata = await getSeoMetadata({
+    slug: `france-${region}-${city}-${event}`,
+    lang,
+    fallback: {
+      title:
+        eventData?.title ||
+        (lang === "fr" ? "Détail de la course" : "Race details"),
+      description:
+        lang === "fr"
+          ? `Informations sur la course ${eventData?.title || ""} à ${city}.`
+          : `Information about the race ${eventData?.title || ""} in ${city}.`,
+    },
+  });
+
   return {
-    title: eventData?.title || t.metadata.title,
-    description: t.metadata.description.replace(
-      "{title}",
-      eventData?.title || ""
-    ),
+    title: metadata.title,
+    description: metadata.description,
+    openGraph: {
+      title: metadata.title,
+      description: metadata.description,
+      type: "website",
+      locale: lang,
+      alternateLocale: lang === "fr" ? "en" : "fr",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: metadata.title,
+      description: metadata.description,
+    },
   };
 };
 

@@ -1,8 +1,9 @@
 import { headers } from "next/headers";
 import { Country, SupabaseResponse } from "@/types/types";
 import { supabase } from "@/lib/supabase";
+import { getSeoMetadata } from "@/lib/getSeoMetadata";
+import { Metadata } from "next";
 
-// Translations object
 const translations = {
   fr: {
     error: {
@@ -115,6 +116,46 @@ const translations = {
 
 export async function generateStaticParams() {
   return [{ lang: "fr" }, { lang: "en" }];
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: "fr" | "en" }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+
+  const metadata = await getSeoMetadata({
+    slug: "home",
+    lang,
+    fallback: {
+      title:
+        lang === "fr"
+          ? "Courses à Pied - Découvrez les meilleures courses à pied en Europe"
+          : "Courses à Pied - Discover the best running events in Europe",
+      description:
+        lang === "fr"
+          ? "Découvrez et participez aux meilleures courses à pied à travers l'Europe. Des événements pour tous les niveaux, de débutant à expert."
+          : "Discover and participate in the best running events across Europe. Events for all levels, from beginner to expert.",
+    },
+  });
+
+  return {
+    title: metadata.title,
+    description: metadata.description,
+    openGraph: {
+      title: metadata.title,
+      description: metadata.description,
+      type: "website",
+      locale: lang,
+      alternateLocale: lang === "fr" ? "en" : "fr",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: metadata.title,
+      description: metadata.description,
+    },
+  };
 }
 
 export default async function Home({
