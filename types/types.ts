@@ -54,6 +54,7 @@ export type Event = {
   city_id: string;
   city_slug?: string;
   is_published: boolean;
+  is_featured?: boolean;
   meta_id?: string;
   created_at?: string;
 };

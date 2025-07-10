@@ -10,12 +10,22 @@ export default function EventCard({
   const registerLabel = lang === "en" ? "Register" : "S'inscrire";
 
   return (
-    <div className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden border border-gray-100">
+    <div
+      className={`group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden border border-gray-100 ${
+        event.is_featured ? "is-featured border-2 border-yellow-400" : ""
+      }`}
+    >
       {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
       {/* Card Content */}
       <div className="relative p-6">
+        {/* Featured badge */}
+        {event.is_featured && (
+          <span className="inline-block mb-2 px-3 py-1 bg-yellow-400 text-white text-xs font-bold rounded-full">
+            ⭐ Événement à la une
+          </span>
+        )}
         {/* Header */}
         <div className="mb-4">
           <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors duration-300 line-clamp-2">

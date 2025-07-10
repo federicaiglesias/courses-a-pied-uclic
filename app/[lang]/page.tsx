@@ -3,6 +3,7 @@ import { Country, SupabaseResponse } from "@/types/types";
 import { supabase } from "@/lib/supabase";
 import { getSeoMetadata } from "@/lib/getSeoMetadata";
 import { Metadata } from "next";
+import EventCard from "@/components/EventCard";
 
 const translations = {
   fr: {
@@ -186,6 +187,13 @@ export default async function Home({
     .from("countries")
     .select("*");
 
+  // Fetch featured events
+  const { data: featuredEvents } = await supabase
+    .from("events")
+    .select("*")
+    .eq("is_featured", true)
+    .limit(8);
+
   if (error) {
     console.error("Erreur Supabase:", error.message);
     return (
@@ -311,6 +319,27 @@ export default async function Home({
           </div>
         </div>
       </section>
+      {/* Featured Events Section */}
+      {featuredEvents && featuredEvents.length > 0 && (
+        <section className="py-16 px-6">
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-yellow-600 mb-8 text-center">
+              ⭐ {lang === "fr" ? "Événements à la une" : "Featured Events"}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {featuredEvents.map((event) => (
+                <EventCard
+                  key={event.id}
+                  event={event}
+                  regionSlug={event.region_slug}
+                  city={{ slug: event.city_slug }}
+                  lang={lang}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Features Section */}
       <section className="py-20 px-6 bg-gradient-to-r from-gray-50 to-blue-50">
