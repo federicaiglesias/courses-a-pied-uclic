@@ -166,15 +166,28 @@ export async function generateMetadata({
     },
   });
 
+  // Build canonical URL
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://courses-a-pied.com";
+  const canonicalUrl = `${baseUrl}/${lang}/france`;
+
   return {
     title: metadata.title,
     description: metadata.description,
+    alternates: {
+      canonical: canonicalUrl,
+      languages: {
+        fr: `${baseUrl}/fr/france`,
+        en: `${baseUrl}/en/france`,
+      },
+    },
     openGraph: {
       title: metadata.title,
       description: metadata.description,
       type: "website",
       locale: lang,
       alternateLocale: lang === "fr" ? "en" : "fr",
+      url: canonicalUrl,
     },
     twitter: {
       card: "summary_large_image",
