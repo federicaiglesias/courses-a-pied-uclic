@@ -4,6 +4,7 @@ import EventCard from "@/components/EventCard";
 import Pagination from "@/components/Pagination";
 import { City, Event, SupabaseResponse } from "@/types/types";
 import { getSeoMetadata } from "@/lib/getSeoMetadata";
+import { fetchEventsWithTranslation } from "@/lib/fetchEvents";
 import { Metadata } from "next";
 
 // Translations object
@@ -182,10 +183,10 @@ export default async function RegionPage({ params, searchParams }: Props) {
   const itemsPerPage = 20;
   const t = translations[lang];
 
-  // Verificar si la región existe
+  // Verificar si la región existe y obtener su nombre
   const { data: regionData, error: regionError } = await supabase
     .from("regions")
-    .select("slug")
+    .select("slug, name")
     .eq("slug", region)
     .eq("country_slug", "france")
     .single();
@@ -249,11 +250,22 @@ export default async function RegionPage({ params, searchParams }: Props) {
 
   const citySlugs: string[] = cities?.map((city: City) => city.slug) || [];
 
-  const { data: events, error: eventsError }: SupabaseResponse<Event> =
-    await supabase.from("events").select("*").in("city_slug", citySlugs);
+  // Fetch events with translation
+  let events: Event[] = [];
+  try {
+    events = await fetchEventsWithTranslation({
+      lang,
+      filters: {
+        is_published: true,
+      },
+    });
 
-  if (eventsError) {
-    console.error("Erreur Supabase (events):", eventsError.message);
+    // Filter events by city slugs
+    events = events.filter((event) =>
+      citySlugs.includes(event.city_slug || "")
+    );
+  } catch (error) {
+    console.error("Erreur Supabase (events):", error);
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
         <div className="text-center p-8">
@@ -283,7 +295,10 @@ export default async function RegionPage({ params, searchParams }: Props) {
 
           <h1 className="text-5xl md:text-6xl font-black mb-6 tracking-tight leading-tight">
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-100">
-              {t.hero.title.region.replace("{region}", region)}
+              {t.hero.title.region.replace(
+                "{region}",
+                regionData?.name || region
+              )}
             </span>
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-300">
               {t.hero.title.running}
@@ -291,7 +306,7 @@ export default async function RegionPage({ params, searchParams }: Props) {
           </h1>
 
           <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-8 text-blue-100 leading-relaxed">
-            {t.hero.subtitle.replace("{region}", region)}
+            {t.hero.subtitle.replace("{region}", regionData?.name || region)}
             <span className="block mt-2 text-lg text-blue-200">
               {t.hero.subtitle2}
             </span>
@@ -313,7 +328,10 @@ export default async function RegionPage({ params, searchParams }: Props) {
             <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
               <span className="text-2xl">🌟</span>
               <span className="font-semibold">
-                {t.hero.stats.region.replace("{region}", region)}
+                {t.hero.stats.region.replace(
+                  "{region}",
+                  regionData?.name || region
+                )}
               </span>
             </div>
           </div>
@@ -325,7 +343,7 @@ export default async function RegionPage({ params, searchParams }: Props) {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              {t.cities.title.replace("{region}", region)}
+              {t.cities.title.replace("{region}", regionData?.name || region)}
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
               {t.cities.description}
@@ -351,10 +369,13 @@ export default async function RegionPage({ params, searchParams }: Props) {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                {t.events.title.replace("{region}", region)}
+                {t.events.title.replace("{region}", regionData?.name || region)}
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                {t.events.description.replace("{region}", region)}
+                {t.events.description.replace(
+                  "{region}",
+                  regionData?.name || region
+                )}
               </p>
             </div>
 
@@ -381,7 +402,10 @@ export default async function RegionPage({ params, searchParams }: Props) {
               {t.events.noEvents.title}
             </h2>
             <p className="text-xl text-gray-600 mb-8">
-              {t.events.noEvents.message.replace("{region}", region)}
+              {t.events.noEvents.message.replace(
+                "{region}",
+                regionData?.name || region
+              )}
             </p>
             <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
@@ -418,7 +442,7 @@ export default async function RegionPage({ params, searchParams }: Props) {
       <section className="py-20 px-6 bg-gradient-to-r from-blue-600 to-indigo-700">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold text-white mb-6">
-            {t.cta.title.replace("{region}", region)}
+            {t.cta.title.replace("{region}", regionData?.name || region)}
           </h2>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
             {t.cta.description}

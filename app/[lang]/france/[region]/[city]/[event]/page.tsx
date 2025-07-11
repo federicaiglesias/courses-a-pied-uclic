@@ -2,7 +2,17 @@ import { supabase } from "@/lib/supabase";
 import { Metadata } from "next";
 import { Event, SupabaseSingleResponse } from "@/types/types";
 import { getSeoMetadata } from "@/lib/getSeoMetadata";
+import { fetchEventWithTranslation, formatEventDate } from "@/lib/fetchEvents";
 import EventJsonLd from "@/components/EventJsonLd";
+
+/**
+ * Capitalizes the first letter of a string
+ * @param str - String to capitalize
+ * @returns Capitalized string
+ */
+function capitalizeFirstLetter(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
 // Translations object
 const translations = {
@@ -223,14 +233,14 @@ export default async function EventDetails({ params }: Props) {
   const { region, city, event, lang } = await params;
   const t = translations[lang];
 
-  // Verificar que el evento existe y pertenece a la ciudad correcta
-  const { data: eventData, error }: SupabaseSingleResponse<Event> =
-    await supabase
-      .from("events")
-      .select("*")
-      .eq("slug", event)
-      .eq("city_slug", city)
-      .single();
+  // Fetch event with translation
+  const eventData = await fetchEventWithTranslation({
+    slug: event,
+    lang,
+    filters: {
+      city_slug: city,
+    },
+  });
 
   // Verificar que la ciudad pertenece a la región correcta
   const { data: cityData } = await supabase
@@ -263,8 +273,8 @@ export default async function EventDetails({ params }: Props) {
     );
   }
 
-  if (error || !eventData) {
-    console.error("Erreur Supabase:", error?.message);
+  if (!eventData) {
+    console.error("Event not found:", event);
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
         <div className="text-center p-8">
@@ -313,7 +323,9 @@ export default async function EventDetails({ params }: Props) {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
               <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
                 <span className="text-2xl">{t.hero.stats.location}</span>
-                <span className="font-semibold">{eventData.city_slug}</span>
+                <span className="font-semibold">
+                  {capitalizeFirstLetter(eventData.city_slug || "")}
+                </span>
               </div>
               <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
                 <span className="text-2xl">{t.hero.stats.distance}</span>
@@ -358,7 +370,7 @@ export default async function EventDetails({ params }: Props) {
                         {t.details.sections.dateTime.title}
                       </h3>
                       <p className="text-gray-700 text-lg font-medium">
-                        {eventData.date}
+                        {formatEventDate(eventData.date, lang)}
                       </p>
                     </div>
                     {/* Lugar */}
@@ -370,7 +382,7 @@ export default async function EventDetails({ params }: Props) {
                         {t.details.sections.location.title}
                       </h3>
                       <p className="text-gray-700 text-lg font-medium">
-                        {eventData.city_slug}
+                        {capitalizeFirstLetter(eventData.city_slug || "")}
                       </p>
                     </div>
                   </div>
@@ -470,7 +482,10 @@ export default async function EventDetails({ params }: Props) {
               {t.cta.title}
             </h2>
             <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-              {t.cta.description.replace("{city}", eventData.city_slug || "")}
+              {t.cta.description.replace(
+                "{city}",
+                capitalizeFirstLetter(eventData.city_slug || "")
+              )}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a

@@ -1,4 +1,5 @@
 import { EventCardProps } from "@/types/types";
+import { formatEventDate } from "@/lib/fetchEvents";
 
 export default function EventCard({
   event,
@@ -8,6 +9,7 @@ export default function EventCard({
 }: EventCardProps) {
   const detailLabel = lang === "en" ? "See details" : "Voir détails";
   const registerLabel = lang === "en" ? "Register" : "S'inscrire";
+  const featuredLabel = lang === "en" ? "Featured Event" : "Événement à la une";
 
   return (
     <div
@@ -23,9 +25,10 @@ export default function EventCard({
         {/* Featured badge */}
         {event.is_featured && (
           <span className="inline-block mb-2 px-3 py-1 bg-yellow-400 text-white text-xs font-bold rounded-full">
-            ⭐ Événement à la une
+            ⭐ {featuredLabel}
           </span>
         )}
+
         {/* Header */}
         <div className="mb-4">
           <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors duration-300 line-clamp-2">
@@ -37,7 +40,9 @@ export default function EventCard({
         <div className="space-y-3 mb-6 text-gray-600">
           <div className="flex items-center space-x-3">
             <span className="text-xl">📅</span>
-            <span className="font-medium">{event.date}</span>
+            <span className="font-medium">
+              {formatEventDate(event.date, lang)}
+            </span>
           </div>
 
           <div className="flex items-center space-x-3">

@@ -4,6 +4,7 @@ import EventCard from "@/components/EventCard";
 import Pagination from "@/components/Pagination";
 import { Region, City, Event, SupabaseResponse } from "@/types/types";
 import { getSeoMetadata } from "@/lib/getSeoMetadata";
+import { fetchEventsWithTranslation } from "@/lib/fetchEvents";
 import { Metadata } from "next";
 
 type PageProps = {
@@ -240,7 +241,6 @@ export default async function FrancePage({ params, searchParams }: PageProps) {
       </div>
     );
   }
-  console.log("regionSlugs →", regionSlugs);
   const { data: cities, error: citiesError }: SupabaseResponse<City> =
     await supabase.from("cities").select("*").in("region_slug", regionSlugs);
 
@@ -283,16 +283,26 @@ export default async function FrancePage({ params, searchParams }: PageProps) {
   const totalPages = Math.ceil((totalEvents || 0) / itemsPerPage);
   const offset = (currentPage - 1) * itemsPerPage;
 
-  const { data: events, error: eventsError }: SupabaseResponse<Event> =
-    await supabase
-      .from("events")
-      .select("*")
-      .in("city_slug", citySlugs)
-      .range(offset, offset + itemsPerPage - 1)
-      .order("date", { ascending: true });
+  // Fetch events with translation
+  let events: Event[] = [];
+  try {
+    events = await fetchEventsWithTranslation({
+      lang,
+      filters: {
+        is_published: true,
+      },
+      pagination: {
+        page: currentPage,
+        itemsPerPage,
+      },
+    });
 
-  if (eventsError) {
-    console.error("Erreur Supabase (events):", eventsError.message);
+    // Filter events by city slugs
+    events = events.filter((event) =>
+      citySlugs.includes(event.city_slug || "")
+    );
+  } catch (error) {
+    console.error("Erreur Supabase (events):", error);
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
         <div className="text-center p-8">

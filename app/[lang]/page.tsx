@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { Country, SupabaseResponse } from "@/types/types";
 import { supabase } from "@/lib/supabase";
 import { getSeoMetadata } from "@/lib/getSeoMetadata";
+import { fetchEventsWithTranslation } from "@/lib/fetchEvents";
 import { Metadata } from "next";
 import EventCard from "@/components/EventCard";
 
@@ -187,12 +188,18 @@ export default async function Home({
     .from("countries")
     .select("*");
 
-  // Fetch featured events
-  const { data: featuredEvents } = await supabase
-    .from("events")
-    .select("*")
-    .eq("is_featured", true)
-    .limit(8);
+  // Fetch featured events with translation
+  const featuredEvents = await fetchEventsWithTranslation({
+    lang,
+    filters: {
+      is_featured: true,
+      is_published: true,
+    },
+    pagination: {
+      page: 1,
+      itemsPerPage: 8,
+    },
+  });
 
   if (error) {
     console.error("Erreur Supabase:", error.message);
