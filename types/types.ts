@@ -121,7 +121,7 @@ export type SupabaseSingleResponse<T> = {
 export type PageBlock = {
   id: string;
   page_slug: string;
-  type: "text" | "hero" | "list_events";
+  type: "text" | "hero" | "list_events" | "contact_form";
   order: number;
   markdown?: string;
   title?: string;

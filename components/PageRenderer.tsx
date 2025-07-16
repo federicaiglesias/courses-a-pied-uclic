@@ -1,5 +1,6 @@
 import HeroBlock from "./blocks/HeroBlock";
 import TextBlock from "./blocks/TextBlock";
+import ContactFormBlock from "./blocks/ContactFormBlock";
 import type { PageBlock } from "@/types/types";
 
 type Props = {
@@ -17,6 +18,14 @@ export default function PageRenderer({ blocks, lang = "fr" }: Props) {
           case "hero":
             return (
               <HeroBlock
+                key={i}
+                title={block.title}
+                subtitle={block.subtitle}
+              />
+            );
+          case "contact_form":
+            return (
+              <ContactFormBlock
                 key={i}
                 title={block.title}
                 subtitle={block.subtitle}

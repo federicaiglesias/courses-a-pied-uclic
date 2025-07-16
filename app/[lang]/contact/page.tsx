@@ -68,7 +68,21 @@ export default async function ContactPage({
     .eq("page_slug", "contact")
     .order("order");
 
-  const blocks = data as PageBlock[];
+  const blocks = (data as PageBlock[])?.length
+    ? (data as PageBlock[])
+    : [
+        {
+          id: "contact-form-block",
+          page_slug: "contact",
+          type: "contact_form",
+          order: 1,
+          title: lang === "fr" ? "Contactez-nous" : "Contact Us",
+          subtitle:
+            lang === "fr"
+              ? "Remplissez le formulaire ci-dessous et nous vous répondrons rapidement."
+              : "Fill out the form below and we will get back to you soon.",
+        } as PageBlock,
+      ];
   console.log("BLOQUES DESDE SUPABASE", blocks);
 
   return (
