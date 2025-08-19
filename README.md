@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏃‍♀️ Courses à Pied – Multilingual Event Website  
 
-## Getting Started
+A **multilingual event website** built with **Next.js 14** and **Supabase**, developed during my internship at [Uclic](https://uclic.io).  
+The platform allows users to explore and register for running events while offering **dynamic SEO**, **responsive design**, and **CMS-driven content management**.  
 
-First, run the development server:
+🔗 **Live Demo**: [courses-a-pied-uclic.vercel.app](https://courses-a-pied-uclic.vercel.app/)  
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Features
+- 🌍 **Multilingual support** (French / English)  
+- ⚡ **SEO optimized** with dynamic metadata per event  
+- 📱 **Responsive design** for mobile, tablet, and desktop  
+- 📊 **Event pagination** for better navigation and performance  
+- 🗄️ **Supabase integration** as the backend & database  
+- 📰 **CMS-driven content**: events and content managed dynamically  
+- ✅ **Accessibility & Performance** tested with **Lighthouse (90+ across all categories)**  
+- 🔄 **Automation workflows** with **n8n + OpenAI** for translation support  
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Tech Stack
+**Frontend**: Next.js 14, React, TailwindCSS  
+**Backend & Database**: Supabase  
+**Deployment**: Vercel  
+**Automation**: n8n, OpenAI (GPT)  
+**Other Tools**: Git, GitHub, Cursor  
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🚀 Performance & Results
+- ✅ Achieved **Lighthouse scores above 90** (Performance, Accessibility, SEO)  
+- ✅ Delivered a **fully functional multilingual CMS-driven website in 4 weeks**  
+- ✅ Successfully integrated **AI-assisted translation workflows**  
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
+📄 License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+This project was developed as part of an internship at Uclic.
+Feel free to explore and adapt the code for educational purposes.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
